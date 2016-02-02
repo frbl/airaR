@@ -1,9 +1,4 @@
-rm(list=ls(pos='.GlobalEnv',all=TRUE),pos='.GlobalEnv')
-
-#install.packages("vars")
-library('vars')
-library('devtools')
-library('autovar',character.only=TRUE)
+#rm(list=ls(pos='.GlobalEnv',all=TRUE),pos='.GlobalEnv')
 
 myPsi.varest <-
   function(x, nstep=10, ...){
@@ -22,9 +17,9 @@ myPsi.varest <-
     sigma.u <- crossprod(resid(x)) / (x$obs - params)
     #sigma.u <- (crossprod(resid(x)) / (x$obs-14))
     P <- t(chol(sigma.u))
-    if(ORDER == 1) {
-      P <- t(P)
-    }
+    #if(1 == 1) {
+    #  P <- t(P)
+    #}
 
     dim3 <- dim(Phi)[3]
     for(i in 1:dim3){
@@ -43,24 +38,37 @@ override_function <- function(origfuncname,packagename,newfunc) {
 }
 override_function("Psi.varest","vars",myPsi.varest)
 
-
+#' The aira main class.
+#'
+#' @field bootstrap_iterations the number of bootstrap iterations to do for determining the significance of the effects
+#' @field horizon the number of steps to look in the future
+#' @field var_model the var model to perform the calculations on
+#' @field orthogonalize use orthogonalized IRF
 Aira <- setRefClass('Aira',
   fields = c(
     "bootstrap_iterations",
-    "steps",
-    "var_model"
+    "horizon",
+    "var_model",
+    "orthogonalize"
   ),
   methods = list(
     determine_best_node_from_all = function() {
+      "Returns the total effect a variable has on all other variables in the network.
+      If bootstrap iterations provided to aira is 0, we will not run any bootstrapping.
+      If bootstrap iterations >0, we will only consider the significant effects in the response"
       total <- list()
       for (variable in 1:var_model$K) {
         variable_name <- .get_variable_name(variable)
         total[variable_name] <- .calculate_irf(variable_name)
-        #print(x)
       }
       total
     },
+
     determine_percentage_effect  = function(variable_to_improve, percentage) {
+      "Returns the percentage for each variable in the network (other then the provided variable)
+      to be changed in order to change the variable_to_improve with the given percentage.
+      @param variable_to_improve the name of the variable in the network which we'd like to improve
+      @param percentage the percentage with which we'd like to improve the variable to improve"
       total <- list()
       for (variable in 1:var_model$K) {
         variable_name <- .get_variable_name(variable)
@@ -69,37 +77,42 @@ Aira <- setRefClass('Aira',
 
         effect <- .calculate_irf(variable_name, variable_to_improve)
         if (abs(effect) < 0.0001) {
-          # do something, return null or infinity
+          # TODO: do something, return null or infinity
           next
         }
 
         needed_difference <- mean(var_model$y[,variable_to_improve]) * (percentage / 100)
         needed_difference <- needed_difference / effect
         needed_difference <- needed_difference / mean(var_model$y[,variable_name])
+
         total[variable_name] <- needed_difference
       }
       total
     },
-    .get_variable_name = function(id) {
-      dimnames(var_model$y)[[2]][[id]]
+
+    get_all_variable_names = function() {
+      "returns all variables in the var model"
+      dimnames(var_model$y)[[2]]
     },
+
+    .get_variable_name = function(id) {
+      get_all_variable_names()[[id]]
+    },
+
     .calculate_irf = function(variable_name, response = NULL){
       res <- 0
       if (bootstrap_iterations > 0) {
-        x <- irf(var_model, impulse=variable_name, response = response, n.ahead = steps, cumulative= FALSE, boot = bootstrap_iterations, ortho = TRUE)
+        x <- irf(var_model, impulse=variable_name, response = response, n.ahead = horizon, cumulative= FALSE, boot = bootstrap_iterations, ortho = orthogonalize)
         plot(x)
         low <- (x$Lower[[variable_name]] * (x$Lower[[variable_name]] > 0))
         high <- (x$Upper[[variable_name]] * (x$Upper[[variable_name]] < 0))
         sign_effects <- (low + high)[, !dimnames(x$Lower[[variable_name]])[[2]] %in% variable_name]
         res <- sum(sign_effects)
       } else {
-        x <- irf(var_model, impulse=variable_name, response = response, n.ahead = steps, cumulative= FALSE, ortho = TRUE, boot= FALSE)
-
+        x <- irf(var_model, impulse=variable_name, response = response, n.ahead = horizon, cumulative= FALSE, ortho = orthogonalize, boot= FALSE)
         x <- x$irf[[variable_name]][, !dimnames(x$irf[[variable_name]])[[2]] %in% variable_name, drop=FALSE]
 
         res <- as.numeric(colSums(x))
-
-        print(res)
       }
       res
     }
