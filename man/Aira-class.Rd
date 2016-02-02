@@ -16,6 +16,8 @@ The aira main class.
 \item{\code{horizon}}{the number of steps to look in the future}
 
 \item{\code{var_model}}{the var model to perform the calculations on}
+
+\item{\code{orthogonalize}}{use orthogonalized IRF}
 }}
 \section{Methods}{
 
@@ -28,5 +30,7 @@ If bootstrap iterations >0, we will only consider the significant effects in the
 to be changed in order to change the variable_to_improve with the given percentage.
 @param variable_to_improve the name of the variable in the network which we'd like to improve
 @param percentage the percentage with which we'd like to improve the variable to improve}
+
+\item{\code{get_all_variable_names()}}{returns all variables in the var model}
 }}
 

@@ -4,6 +4,7 @@ testdata_var_model <- function() {
   data_set <- autovar::read_spss("../../pp1 nieuw compleet.sav", to.data.frame=TRUE)
   endodata <- data_set[,c('SomBewegUur', 'SomPHQ')]
   exodata <- data_set[,c('UitbijterPHQ','UitbijterBeweg')]
+
   vars::VAR(endodata, exogen=exodata, p=2, type='const')
 }
 
@@ -15,17 +16,17 @@ test_that('determine_best_node_from_all', {
     expect_equal(tot$SomBewegUur, -1.859704, tolerance=1e-5)
     expect_equal(tot$SomPHQ, 0.1706285, tolerance=1e-5)
   })
-  test_that('it can use bootstrapping to returns the total significant effect of a variable on the other variables', {
-    aira <- Aira$new(bootstrap_iterations = 1000, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE)
-    tot <- aira$determine_best_node_from_all()
-
-    # According to the Rosmalen paper, in this model we would expect a significant NEGATIVE effect
-    # from sombeweguur on the som phq variable. The effect is rather large, i.e. < -.15 (i.e. order 1)
-    expect_lt(tot$SomBewegUur, -0.15)
-
-    # Furthermore, they show that for order one, no significant effect exist from the somphq variables
-    expect_equal(tot$SomPHQ, 0, tolerance=1e-5)
-  })
+#   test_that('it can use bootstrapping to returns the total significant effect of a variable on the other variables', {
+#     aira <- Aira$new(bootstrap_iterations = 1000, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE)
+#     tot <- aira$determine_best_node_from_all()
+#
+#     # According to the Rosmalen paper, in this model we would expect a significant NEGATIVE effect
+#     # from sombeweguur on the som phq variable. The effect is rather large, i.e. < -.15 (i.e. order 1)
+#     expect_lt(tot$SomBewegUur, -0.15)
+#
+#     # Furthermore, they show that for order one, no significant effect exist from the somphq variables
+#     expect_equal(tot$SomPHQ, 0, tolerance=1e-5)
+#   })
 })
 
 test_that('determine_percentage_effect', {

@@ -60,10 +60,10 @@ Aira <- setRefClass('Aira',
       for (variable in 1:var_model$K) {
         variable_name <- .get_variable_name(variable)
         total[variable_name] <- .calculate_irf(variable_name)
-        #print(x)
       }
       total
     },
+
     determine_percentage_effect  = function(variable_to_improve, percentage) {
       "Returns the percentage for each variable in the network (other then the provided variable)
       to be changed in order to change the variable_to_improve with the given percentage.
@@ -77,7 +77,7 @@ Aira <- setRefClass('Aira',
 
         effect <- .calculate_irf(variable_name, variable_to_improve)
         if (abs(effect) < 0.0001) {
-          # do something, return null or infinity
+          # TODO: do something, return null or infinity
           next
         }
 
@@ -89,9 +89,16 @@ Aira <- setRefClass('Aira',
       }
       total
     },
-    .get_variable_name = function(id) {
-      dimnames(var_model$y)[[2]][[id]]
+
+    get_all_variable_names = function() {
+      "returns all variables in the var model"
+      dimnames(var_model$y)[[2]]
     },
+
+    .get_variable_name = function(id) {
+      get_all_variable_names()[[id]]
+    },
+
     .calculate_irf = function(variable_name, response = NULL){
       res <- 0
       if (bootstrap_iterations > 0) {
