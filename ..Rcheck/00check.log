@@ -1,0 +1,119 @@
+* using log directory ‘/Users/frbl/Workspace/frbl/airaR/AIRA/..Rcheck’
+* using R version 3.2.3 (2015-12-10)
+* using platform: x86_64-apple-darwin15.2.0 (64-bit)
+* using session charset: UTF-8
+* using options ‘--no-manual --no-build-vignettes --as-cran’
+* checking for file ‘./DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘AIRA’ version ‘0.1’
+* checking CRAN incoming feasibility ... NOTE
+Maintainer: ‘Who to complain to <yourfault@somewhere.net>’
+New submission
+
+Non-FOSS package license (What license is it under?)
+* checking package namespace information ... OK
+* checking package dependencies ... NOTE
+  No repository set, so cyclic dependency check skipped
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... WARNING
+Found the following executable files:
+  .git/objects/04/62633f317075779d2489637b529a897339916b
+  .git/objects/0f/a7c4b8817591c2dff2b3997d2566320ac6d9fc
+  .git/objects/0f/d10ecdabc6ee7607b83c20033b483743653592
+  .git/objects/10/b2d3372a8edccbf02bbdaa5af475220a707475
+  .git/objects/10/bc9d83dc5f1d7fecf4e55e0f80d7812e737b07
+  .git/objects/16/4aa37c4c442958bb697524e79a5188cc2be78e
+  .git/objects/1c/06b91c9f076c36301f80ffd19cefea5e8d18b5
+  .git/objects/1e/3179ca248c0cb484b5a506f684ff73160b744f
+  .git/objects/24/9c8e0e924a186278d4db5a99621cccb1ee06b6
+  .git/objects/29/40afd7833c6ae6d42fcbf5d22de434e64e1bd4
+  .git/objects/29/b9b46dc73de721edd43b2db1cabbf28066db44
+  .git/objects/2b/c1af8426f23506d2e85b1668ebd6f3f4b7f1bc
+  .git/objects/30/6b283d191a70a7eb3171cf52485f95e9588337
+  .git/objects/32/2ad153074a9fbbbd14096c1179c72fd0fa68f0
+  .git/objects/33/31ee26057053b0603923b5c7a2691d1f9ae2f9
+  .git/objects/33/413f8a4a66f0f87c826ee2103fd479b02c60ed
+  .git/objects/3b/19d79000a518483218474b72db184332753212
+  .git/objects/40/f759b64a3043570dcb67b916776ced1dd189e5
+  .git/objects/43/22e98e024f0a9c86a6ae4691a41684aa6151e2
+  .git/objects/43/6cc890015ca9bf306c59fe41fc24196b11a9e9
+  .git/objects/49/7f8bfcfb9d13ad61d14d79963641e9aeab41b0
+  .git/objects/4a/48d539ed6580b2f51059faff642d4d53ae9a89
+  .git/objects/51/99117cf063e8239ae854a6e46bc1c287a84802
+  .git/objects/5f/2d4d4ad48fbb839ed14d0b70108279954e5f24
+  .git/objects/62/f3780ad01f3fa4dbf5e9cf98730db521639774
+  .git/objects/65/ddfced511b4ef63cc75ef0161e3b9dc6a27211
+  .git/objects/68/2eb01cf2e96f43052b1fb85841939fee356196
+  .git/objects/6a/e926839dd1829f1016a96f766d970ff184ad97
+  .git/objects/6b/2b00fb63e3dc2fda86ede2ac622acee453844a
+  .git/objects/6b/8fe86a587cb3c015aefed740fe54f13e08b952
+  .git/objects/6c/ad55330f8e5d915f8c37736fef20e3f1c398c7
+  .git/objects/6c/b0dd6391c378578cd9851956ea90927b7ce9ef
+  .git/objects/6d/122230b2187cca798fa8153082464f8ccb4c11
+  .git/objects/6d/b6dc0ec7ece3afe61bf8893fe514e6a50dc4da
+  .git/objects/6d/d7e55ae15d641d1d3c629d0220004bec565cb8
+  .git/objects/6f/33dfa82e29997e108a517cfa5c8088d0c7cccf
+  .git/objects/76/1dc3040622c9e827cf08d113da191a7f8b9a80
+  .git/objects/76/5ccaf3fb9ac392eff70461d38e630343e82e92
+  .git/objects/78/e796b5f634ffe1e0de79810f4de856e2ff4891
+  .git/objects/79/b0513848412f6375dabc041c89c8a575b77836
+  .git/objects/7b/abb47856fcd17f67a150a54a87d3eef3268ba8
+  .git/objects/80/7ea251739a053faee6d72fe9dc3ae80d80cc15
+  .git/objects/81/da250d79911594325c605d33aac7efdcb96deb
+  .git/objects/83/b0ae29bce9de69f8bab4ee992ae30fb7a1d5c3
+  .git/objects/86/3b3af99582f4ac536af9e12c5612f2ca1e75bd
+  .git/objects/8e/ff68f7058287845d34b59ee7473d3b14e37db2
+  .git/objects/91/114bf2f2bba5e0c5252e75018da19b869776f1
+  .git/objects/91/fd2d0c0b2f2ca35400282676e61ea6e2eb29c7
+  .git/objects/94/5c9b021206b56766ef256cfd10c78377cad910
+  .git/objects/95/8c90a490fda244d994d4b4664a1890eba46a75
+  .git/objects/96/39c836f5647137947bf871815df90bf4f53fc0
+  .git/objects/96/992f9d9c1f3af444344e2a3dab6311f3a8244c
+  .git/objects/97/e83922cd94c0dafce21c4d93e961997fc54510
+  .git/objects/a0/b7efa1153ceca89b6c5890602d586a63928582
+  .git/objects/a9/be402245273aa2b7fdcf3f02476aba04650900
+  .git/objects/ad/220bf6e68a077a9b58dabe13794a33c5f76f0f
+  .git/objects/b4/fbab3d07321e072744dd6acc4bccfe8fdf0d2b
+  .git/objects/b6/449fb80c97ca282dd6d8e33ed075f848b3fba1
+  .git/objects/bc/7e623cdda4adf9eb88dac304ad64e18c57f5d7
+  .git/objects/c8/4ea480a0c802a02f6d7b84abdf81e6007feacf
+  .git/objects/ca/efc5c6336459e73315d26cd1e0f2e5bb45d5c5
+  .git/objects/cd/778873e7622cc88d67678b0d831beebb076daf
+  .git/objects/d4/e176a325cf685109b3ae8465afa15f9c029ea0
+  .git/objects/d7/5f824ec6278db24891505b14ab3d915514dba7
+  .git/objects/d9/fb9a5afec9fa71f413552e935b3cece3303a71
+  .git/objects/df/6cbbaea4c56682ab336525f3bec180858a7d1a
+  .git/objects/e6/1530f4fe6fa0aaa31deaa305651310961c3954
+  .git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+  .git/objects/eb/c1b06247c50ad199ee1e2038f918c742e72c93
+  .git/objects/f7/e1bbe67afb95a80b20203775a53915021ea235
+  .git/objects/fa/a7aefa5e90f0ce04b540e29e4677f836a6ac69
+Source packages should not contain undeclared executable files.
+See section ‘Package structure’ in the ‘Writing R Extensions’ manual.
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  .gitignore
+  .RData
+  .Rhistory
+  R/.-package.R
+  R/.DS_Store
+  ..Rcheck
+  .git
+  .Rproj.user
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+
+CRAN-pack does not know about
+  .RData
+  R/.-package.R
+  R/.DS_Store
+  ..Rcheck
+  .git
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘AIRA’ can be installed ... ERROR
+Installation failed.
+See ‘/Users/frbl/Workspace/frbl/airaR/AIRA/..Rcheck/00install.out’ for details.
+* DONE
+Status: 1 ERROR, 1 WARNING, 3 NOTEs
