@@ -34,9 +34,22 @@ AiraOutput <- setRefClass(
       }
       result
     },
+    export_model = function() {
+      "Exports the effects of all variables in the network"
+      network <- .generate_network()
+      scores <- aira$determine_best_node_from_all()
+
+      val <- c()
+      for(i in 1:nrow(network$nodes)) {
+        node <- network$nodes[i,]
+        val <- c(val, scores[[node$name]])
+      }
+      network$nodes$val <- val
+      network
+    },
     export_model_to_json = function() {
       "Exports the effects of all variables in the network in a JSON structure, that can be interpreted by the AIRA JS library"
-
+      jsonlite::toJSON(export_model())
     },
     .determine_effects = function(percentage_effects, result, variable_to_improve, percentage_to_improve) {
       for (name in names(percentage_effects)) {
@@ -46,6 +59,76 @@ AiraOutput <- setRefClass(
         result <- paste(result, "by ", direction, " your ", name, " with ", abs(effect), '%\n', sep ="")
       }
       result
+    },
+    .generate_network = function() {
+      varres <- aira$var_model$varresult
+
+      var_names <- names(varres)
+
+      # create a data.frame of significant connections, order it by coefficient strength
+      linkstr <- NULL
+      i <- 0
+
+      nodedata <- NULL
+      linkdata <- NULL
+      rnames <- NULL
+      nodecount <- 0
+      nodedegree <- list()
+
+      # Create node data
+      for (varname in var_names) {
+        if (varname %in% rnames) next
+        nodedata <- rbind(nodedata,data.frame(index=nodecount,
+                                              name=varname,
+                                              key=varname,
+                                              stringsAsFactors=FALSE))
+        rnames <- c(rnames,varname)
+        nodecount <- nodecount+1
+      }
+
+      # Create edge data
+      for (equation in varres) {
+        i <- i+1
+        eqsum <- summary(equation)
+        eqname <- var_names[i]
+        for (fromnodename in var_names) {
+          if (fromnodename == eqname) next
+
+          from_name_in_equation <- TRUE
+          any_pval_significant <- FALSE
+          significant_lag <- 0
+
+          for(lag in 1:aira$var_model$p){
+            from_name_in_equation <- from_name_in_equation & (paste(fromnodename, ".l", lag, sep = "") %in% rownames(coef(eqsum)))
+            p_val <- eqsum$coefficients[paste(fromnodename,'.l1',sep=""),4]
+            any_pval_significant <- any_pval_significant | (p_val <= 0.05)
+
+            # The first significant lag is considered the most important, and is used for plotting the coef
+            if (significant_lag == 0 & p_val <= 0.05) significant_lag <- lag
+          }
+          if (!from_name_in_equation | !any_pval_significant) next
+
+          nodedegree[[fromnodename]] <- ifelse(is.null(nodedegree[[fromnodename]]),0,nodedegree[[fromnodename]]) + 1
+          nodedegree[[eqname]] <- ifelse(is.null(nodedegree[[eqname]]),0,nodedegree[[eqname]]) + 1
+
+          coef <- eqsum$coefficients[paste(fromnodename,'.l', significant_lag, sep=""),1]
+
+          linkstr <- rbind(linkstr,data.frame(source=fromnodename,
+                                              target=eqname,
+                                              coef=abs(coef),
+                                              sign=sign(coef),
+                                              stringsAsFactors=FALSE))
+
+          tonode<- which(eqname == rnames) - 1
+          fromnode <- which(fromnodename == rnames) - 1
+          linkdata <- rbind(linkdata,data.frame(source=fromnode,
+                                                target=tonode,
+                                                distance=0.9,
+                                                weight=toString(coef),
+                                                stringsAsFactors=FALSE))
+        }
+      }
+      list(links = linkdata,nodes = nodedata)
     }
   )
 )

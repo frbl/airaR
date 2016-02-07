@@ -3,8 +3,7 @@ library('autovar',character.only=TRUE)
 
 compare_with_rosmalen <- function() {
   variable_name <- 'U'
-
-  dataset = suppressWarnings(read.spss("pp1 nieuw compleet.sav", to.data.frame=TRUE))
+  dataset = suppressWarnings(read.spss("inst/pp1_nieuw_compleet.sav", to.data.frame=TRUE))
   endodata = dataset[,c('SomBewegUur', 'SomPHQ')]
   exodata = dataset[,c('UitbijterPHQ','UitbijterBeweg')]
   var.2c = VAR(endodata, exogen = exodata, p=2, type='const')
