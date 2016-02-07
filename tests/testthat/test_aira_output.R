@@ -24,3 +24,31 @@ test_that('print_percentage_effect', {
   expected = paste(expected, "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 72%\n", sep ="")
   expect_equal(result, expected)
 })
+
+test_that('export_model_to_json', {
+  json_example ='{
+  "nodes": [
+    {
+      "name": "SomPHQ",
+      "key": "SomPHQ",
+      "val": 3
+    }, {
+      "name": "SomBewegUur",
+      "key": "SomBewegUur",
+      "val": 3
+    }
+  ],
+  "links": [{
+    "weight": 0.1,
+    "distance": 0.9,
+    "source": 0,
+    "target": 1
+  }, {
+    "weight": 0.1,
+    "distance": 0.9,
+    "source": 1,
+    "target": 0
+  }]
+}'
+x <- jsonlite::fromJSON(json_example)
+})

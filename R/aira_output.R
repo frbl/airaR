@@ -35,6 +35,7 @@ AiraOutput <- setRefClass(
       result
     },
     export_model_to_json = function() {
+      "Exports the effects of all variables in the network in a JSON structure, that can be interpreted by the AIRA JS library"
 
     },
     .determine_effects = function(percentage_effects, result, variable_to_improve, percentage_to_improve) {

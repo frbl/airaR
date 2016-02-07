@@ -12,5 +12,6 @@ Suggests:
     testthat
 Imports:
     autovar,
-    vars
+    vars,
+    jsonlite
 RoxygenNote: 5.0.0
