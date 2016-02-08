@@ -1,13 +1,16 @@
 #' The aira output class.
 #'
 #' @field aira an instance of aira
+#' @importFrom jsonlite toJSON
+#' @importFrom jsonlite fromJSON
+#' @importFrom methods setRefClass
 AiraOutput <- setRefClass(
   'AiraOutput',
   fields = c("aira"),
   methods = list(
     print_overview_percentage_effect = function(percentage_to_improve = 10) {
       "Prints the percentage increases for all variables in the model.
-      @param percentage_to_improve the percentage to improve the variables with (default 10%)"
+      @param percentage_to_improve the percentage to improve the variables with (default 10 percent)"
       result <- ""
       for (variable_to_improve in aira$get_all_variable_names()) {
         percentage_effects <- aira$determine_percentage_effect(variable_to_improve = variable_to_improve, percentage_to_improve)
@@ -23,7 +26,7 @@ AiraOutput <- setRefClass(
     print_percentage_effect = function(variable_to_improve, percentage_to_improve = 10) {
       "Prints the percentage increases needed for a specific variable.
       @param variable_to_improve the actuabl variable to improve
-      @param percentage_to_improve the percentage to improve the variable with (default 10%)"
+      @param percentage_to_improve the percentage to improve the variable with (default 10 percent)"
       result <- ""
       percentage_effects <- aira$determine_percentage_effect(variable_to_improve = variable_to_improve, percentage_to_improve)
       if (length(percentage_effects) > 0) {
@@ -49,7 +52,7 @@ AiraOutput <- setRefClass(
     },
     export_model_to_json = function() {
       "Exports the effects of all variables in the network in a JSON structure, that can be interpreted by the AIRA JS library"
-      jsonlite::toJSON(export_model())
+      toJSON(export_model())
     },
     .determine_effects = function(percentage_effects, result, variable_to_improve, percentage_to_improve) {
       for (name in names(percentage_effects)) {

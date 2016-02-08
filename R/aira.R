@@ -44,6 +44,11 @@ override_function("Psi.varest","vars",myPsi.varest)
 #' @field horizon the number of steps to look in the future
 #' @field var_model the var model to perform the calculations on
 #' @field orthogonalize use orthogonalized IRF
+#' @importFrom vars VAR
+#' @importFrom vars irf
+#' @importFrom vars Bcoef
+#' @importFrom vars Phi
+#' @importFrom methods setRefClass
 Aira <- setRefClass('Aira',
   fields = c(
     "bootstrap_iterations",
