@@ -21,10 +21,10 @@ The aira output class.
 \item{\code{export_model_to_json()}}{Exports the effects of all variables in the network in a JSON structure, that can be interpreted by the AIRA JS library}
 
 \item{\code{print_overview_percentage_effect(percentage_to_improve = 10)}}{Prints the percentage increases for all variables in the model.
-@param percentage_to_improve the percentage to improve the variables with (default 10%)}
+@param percentage_to_improve the percentage to improve the variables with (default 10 percent)}
 
 \item{\code{print_percentage_effect(variable_to_improve, percentage_to_improve = 10)}}{Prints the percentage increases needed for a specific variable.
 @param variable_to_improve the actuabl variable to improve
-@param percentage_to_improve the percentage to improve the variable with (default 10%)}
+@param percentage_to_improve the percentage to improve the variable with (default 10 percent)}
 }}
 

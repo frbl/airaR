@@ -3,13 +3,20 @@ Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1
 Date: 2016-01-15
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: c(person("Frank","Blaauw",role = c("aut","cre"),
+    email = "f.j.blaauw@umcg.nl"))
+BugReports: https://github.com/frbl/aira/issues
+Maintainer: Frank Blaauw <f.j.blaauw@umcg.nl>
+Description: Aira stands for Automated Impulse Response Analysis,
+    which allows researchers to automatically analyze the IRF models of a var model.
+License: MIT + file LICENSE
 LazyData: TRUE
+Depends:
+    methods
 Suggests:
-    testthat
+    testthat,
+    roxygen2,
+    autovar
 Imports:
     vars,
     jsonlite

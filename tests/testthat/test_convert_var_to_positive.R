@@ -1,7 +1,7 @@
 context('convert_var_to_positive')
 
 testdata_var_model <- function() {
-  data(Canada)
+  data(Canada, package='vars')
   data_set <- Canada
   vars::VAR(data_set, p=2, type='const')
 }
