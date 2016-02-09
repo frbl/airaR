@@ -1,2 +1,2 @@
 library('testthat')
-test_check('AIRA')
+test_check('aira')
