@@ -1,3 +1,4 @@
+#' @export
 convert_var_to_positive <- function(var_model, negative_variables) {
   # create a matrix of ones
   #new_coefs = (Bcoef(var_model) | TRUE) * 1

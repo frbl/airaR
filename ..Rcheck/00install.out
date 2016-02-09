@@ -1,0 +1,10 @@
+* installing *source* package ‘AIRA’ ...
+** R
+** inst
+** preparing package for lazy loading
+Warning in library(pkg, character.only = TRUE, logical.return = TRUE, lib.loc = lib.loc,  :
+  there is no package called ‘foreign’
+Error : package ‘foreign’ could not be loaded
+Error : unable to load R code in package ‘AIRA’
+ERROR: lazy loading failed for package ‘AIRA’
+* removing ‘/Users/frbl/Workspace/frbl/airaR/AIRA/..Rcheck/AIRA’
