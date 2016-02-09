@@ -15,3 +15,8 @@ var.2c <-convert_var_to_positive(var.2c, negative_variables = negative_variables
 aira <- Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = var.2c, orthogonalize= TRUE)
 tot <- aira$determine_best_node_from_all()
 print(tot)
+
+
+# Shock Stress
+# Shock Activity
+# Check how to improve PA

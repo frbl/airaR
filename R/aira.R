@@ -102,7 +102,7 @@ Aira <- setRefClass('Aira',
     .get_variable_name = function(id) {
       get_all_variable_names()[[id]]
     },
-    .calculate_irf = function(variable_name, response = NULL, plot=FALSE){
+    .calculate_irf = function(variable_name, response = NULL, plot_results = FALSE){
       resulting_score <- 0
       if (bootstrap_iterations > 0) {
         result <- vars::irf(var_model, impulse=variable_name,
