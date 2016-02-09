@@ -113,12 +113,12 @@ Aira <- setRefClass('Aira',
         low <- (result$Lower[[variable_name]] * (result$Lower[[variable_name]] > 0))
         high <- (result$Upper[[variable_name]] * (result$Upper[[variable_name]] < 0))
         sign_effects <- (low + high)[, !dimnames(result$Lower[[variable_name]])[[2]] %in% variable_name]
-        res <- sum(sign_effects)
+        resulting_score <- sum(sign_effects)
       } else {
         result <- vars::irf(var_model, impulse=variable_name, response = response, n.ahead = horizon, cumulative= FALSE, ortho = orthogonalize, boot= FALSE)
         if (plot_results) plot(result)
         result <- result$irf[[variable_name]][, !dimnames(result$irf[[variable_name]])[[2]] %in% variable_name, drop=FALSE]
-        res <- as.numeric(colSums(result))
+        resulting_score <- as.numeric(colSums(result))
       }
       resulting_score
     }
