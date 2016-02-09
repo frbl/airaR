@@ -4,7 +4,14 @@ testdata_var_model <- function() {
   data_set <- autovar::read_spss("inst/pp1_nieuw_compleet.sav", to.data.frame=TRUE)
   endodata <- data_set[,c('SomBewegUur', 'SomPHQ')]
   exogedata <- data_set[,c('UitbijterPHQ','UitbijterBeweg')]
+  #assign("endodata", "endodata", envir = .GlobalEnv)
+
   vars::VAR(endodata, p=2, type='const', exogen=exogedata)
+  #assign("y", "y", envir = .GlobalEnv)
+  #assign("exogedata", "exogedata", envir = .GlobalEnv)
+  #v$datamat
+  #vars::irf(v, boot=10)
+
 }
 
 test_that('determine_best_node_from_all', {

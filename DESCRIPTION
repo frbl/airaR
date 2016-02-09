@@ -1,4 +1,4 @@
-Package: AIRA
+Package: aira
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1
@@ -7,8 +7,8 @@ Author: c(person("Frank","Blaauw",role = c("aut","cre"),
     email = "f.j.blaauw@umcg.nl"))
 BugReports: https://github.com/frbl/aira/issues
 Maintainer: Frank Blaauw <f.j.blaauw@umcg.nl>
-Description: Aira stands for Automated Impulse Response Analysis,
-    which allows researchers to automatically analyze the IRF models of a var model.
+Description: Aira stands for Automated Impulse Response Analysis, which allows
+    researchers to automatically analyze the IRF models of a var model.
 License: MIT + file LICENSE
 LazyData: TRUE
 Depends:
@@ -20,4 +20,4 @@ Suggests:
 Imports:
     vars,
     jsonlite
-RoxygenNote: 5.0.1
+RoxygenNote: 5.0.0

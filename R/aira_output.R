@@ -4,6 +4,8 @@
 #' @importFrom jsonlite toJSON
 #' @importFrom jsonlite fromJSON
 #' @importFrom methods setRefClass
+#' @export AiraOutput
+#' @exportClass AiraOutput
 AiraOutput <- setRefClass(
   'AiraOutput',
   fields = c("aira"),
