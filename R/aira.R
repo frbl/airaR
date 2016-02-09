@@ -44,6 +44,10 @@ override_function("Psi.varest","vars",myPsi.varest)
 #' @field horizon the number of steps to look in the future
 #' @field var_model the var model to perform the calculations on
 #' @field orthogonalize use orthogonalized IRF
+#' @importFrom vars VAR irf Bcoef Phi
+#' @importFrom methods setRefClass
+#' @export Aira
+#' @exportClass Aira
 Aira <- setRefClass('Aira',
   fields = c(
     "bootstrap_iterations",
@@ -98,23 +102,25 @@ Aira <- setRefClass('Aira',
     .get_variable_name = function(id) {
       get_all_variable_names()[[id]]
     },
-
-    .calculate_irf = function(variable_name, response = NULL){
-      res <- 0
+    .calculate_irf = function(variable_name, response = NULL, plot=FALSE){
+      resulting_score <- 0
       if (bootstrap_iterations > 0) {
-        x <- irf(var_model, impulse=variable_name, response = response, n.ahead = horizon, cumulative= FALSE, boot = bootstrap_iterations, ortho = orthogonalize)
-        plot(x)
-        low <- (x$Lower[[variable_name]] * (x$Lower[[variable_name]] > 0))
-        high <- (x$Upper[[variable_name]] * (x$Upper[[variable_name]] < 0))
-        sign_effects <- (low + high)[, !dimnames(x$Lower[[variable_name]])[[2]] %in% variable_name]
+        result <- vars::irf(var_model, impulse=variable_name,
+                 response = response, n.ahead = horizon, cumulative= FALSE,
+                 boot = bootstrap_iterations, ortho = orthogonalize)
+
+        if (plot_results) plot(result)
+        low <- (result$Lower[[variable_name]] * (result$Lower[[variable_name]] > 0))
+        high <- (result$Upper[[variable_name]] * (result$Upper[[variable_name]] < 0))
+        sign_effects <- (low + high)[, !dimnames(result$Lower[[variable_name]])[[2]] %in% variable_name]
         res <- sum(sign_effects)
       } else {
-        x <- irf(var_model, impulse=variable_name, response = response, n.ahead = horizon, cumulative= FALSE, ortho = orthogonalize, boot= FALSE)
-        x <- x$irf[[variable_name]][, !dimnames(x$irf[[variable_name]])[[2]] %in% variable_name, drop=FALSE]
-
-        res <- as.numeric(colSums(x))
+        result <- vars::irf(var_model, impulse=variable_name, response = response, n.ahead = horizon, cumulative= FALSE, ortho = orthogonalize, boot= FALSE)
+        if (plot_results) plot(result)
+        result <- result$irf[[variable_name]][, !dimnames(result$irf[[variable_name]])[[2]] %in% variable_name, drop=FALSE]
+        res <- as.numeric(colSums(result))
       }
-      res
+      resulting_score
     }
   )
 )

@@ -1,11 +1,17 @@
 context('aira')
 
 testdata_var_model <- function() {
-  data_set <- autovar::read_spss("../../pp1 nieuw compleet.sav", to.data.frame=TRUE)
+  data_set <- autovar::read_spss("inst/pp1_nieuw_compleet.sav", to.data.frame=TRUE)
   endodata <- data_set[,c('SomBewegUur', 'SomPHQ')]
-  exodata <- data_set[,c('UitbijterPHQ','UitbijterBeweg')]
+  exogedata <- data_set[,c('UitbijterPHQ','UitbijterBeweg')]
+  #assign("endodata", "endodata", envir = .GlobalEnv)
 
-  vars::VAR(endodata, exogen=exodata, p=2, type='const')
+  vars::VAR(endodata, p=2, type='const', exogen=exogedata)
+  #assign("y", "y", envir = .GlobalEnv)
+  #assign("exogedata", "exogedata", envir = .GlobalEnv)
+  #v$datamat
+  #vars::irf(v, boot=10)
+
 }
 
 test_that('determine_best_node_from_all', {
@@ -16,8 +22,8 @@ test_that('determine_best_node_from_all', {
     expect_equal(tot$SomBewegUur, -1.859704, tolerance=1e-5)
     expect_equal(tot$SomPHQ, 0.1706285, tolerance=1e-5)
   })
-  test_that('it can use bootstrapping to returns the total significant effect of a variable on the other variables', {
-    aira <- Aira$new(bootstrap_iterations = 1000, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE)
+  test_that('it can use bootstrapping to return the total significant effect of a variable on the other variables', {
+    aira <- Aira$new(bootstrap_iterations = 100, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE)
     tot <- aira$determine_best_node_from_all()
 
     # According to the Rosmalen paper, in this model we would expect a significant NEGATIVE effect
