@@ -1,5 +1,19 @@
 context('aira')
 
+.set_exo <- function(model) {
+  # This is terrible practice. Irf requires the exogen matrix to be available, which is not available anymore.
+  # Here we recreate the matrix by padding the datamat with zeros.
+  # TODO: Fix this!
+  pattern <- paste(dimnames(model$y)[[2]], collapse='|')
+
+  pattern <- paste('const', pattern, sep='|')
+  endogen <- grepl(pattern, names(model$datamat), perl=TRUE)
+  exogedata <<- model$datamat[names(model$datamat)[!endogen]]
+  for ( i in 1:model$p) {
+    exogedata <<- rbind(rep(0, length(!endogen)), exogedata)
+  }
+}
+
 testdata_var_model <- function() {
   data_set <- autovar::read_spss("inst/pp1_nieuw_compleet.sav", to.data.frame=TRUE)
   endodata <- data_set[,c('SomBewegUur', 'SomPHQ')]
@@ -16,6 +30,7 @@ testdata_var_model <- function() {
 
 test_that('determine_best_node_from_all', {
   test_that('it returns the total effect of a variable on the other variables', {
+    .set_exo(testdata_var_model())
     aira <- Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE)
     tot <- aira$determine_best_node_from_all()
 

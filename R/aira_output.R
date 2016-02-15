@@ -98,20 +98,19 @@ AiraOutput <- setRefClass(
         eqname <- var_names[i]
         for (fromnodename in var_names) {
           if (fromnodename == eqname) next
-
-          from_name_in_equation <- TRUE
           any_pval_significant <- FALSE
-          significant_lag <- 0
+          significant_lag <- -1
 
           for(lag in 1:aira$var_model$p){
-            from_name_in_equation <- from_name_in_equation & (paste(fromnodename, ".l", lag, sep = "") %in% rownames(coef(eqsum)))
-            p_val <- eqsum$coefficients[paste(fromnodename,'.l1',sep=""),4]
+            if (!paste(fromnodename, ".l", lag, sep = "") %in% rownames(coef(eqsum))) next
+
+            p_val <- eqsum$coefficients[paste(fromnodename,'.l', lag, sep=""),4]
             any_pval_significant <- any_pval_significant | (p_val <= 0.05)
 
             # The first significant lag is considered the most important, and is used for plotting the coef
-            if (significant_lag == 0 & p_val <= 0.05) significant_lag <- lag
+            if (significant_lag == -1 & p_val <= 0.05) significant_lag <- lag
           }
-          if (!from_name_in_equation | !any_pval_significant) next
+          if (!any_pval_significant) next
 
           nodedegree[[fromnodename]] <- ifelse(is.null(nodedegree[[fromnodename]]),0,nodedegree[[fromnodename]]) + 1
           nodedegree[[eqname]] <- ifelse(is.null(nodedegree[[eqname]]),0,nodedegree[[eqname]]) + 1
