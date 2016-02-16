@@ -17,6 +17,12 @@ Aira <- setRefClass('Aira',
     "orthogonalize"
   ),
   methods = list(
+    initialize = function(bootstrap_iterations, horizon, var_model, orthogonalize, reverse_order=FALSE) {
+      assign('reverse_order', reverse_order, envir= .GlobalEnv)
+      override_function("Psi.varest","vars",myPsi.varest)
+      callSuper(bootstrap_iterations= bootstrap_iterations, horizon = horizon,
+                var_model = var_model, orthogonalize = orthogonalize)
+    },
     determine_best_node_from_all = function() {
       "Returns the total effect a variable has on all other variables in the network.
       If bootstrap iterations provided to aira is 0, we will not run any bootstrapping.
@@ -55,32 +61,85 @@ Aira <- setRefClass('Aira',
       total
     },
 
+    determine_length_of_effect = function(variable_name, response, measurement_interval) {
+      "Returns the time in minues a variable is estimated to have an effect on another variable.
+      @param variable_to_shock the name of the variable to receive the shock
+      @param variable_to_respond the name of the variable to respond to the shock
+      @param measurement interval the time in minutes between two measurements"
+
+      if(bootstrap_iterations <= 0) stop('Bootstrapping is needed for this function.')
+
+      result <- vars::irf(var_model, impulse=variable_name,
+                          response = response, n.ahead = horizon, cumulative= FALSE,
+                          runs = bootstrap_iterations, boot=TRUE, ortho = orthogonalize)
+
+
+
+      lower <- result$Lower[[variable_name]]
+      upper <- result$Upper[[variable_name]]
+
+      low <- (lower > 0)
+      high <- (upper < 0)
+      begin <- 1
+      end <- -1
+      prev <- FALSE
+
+      for (i in 1:horizon) {
+        if (low[i] | high[i]) {
+          # If the beginning of the effect is not on the first measurement, we should interpolate.
+          if (i > 1 & !prev) {
+            if (low[i]){
+              begin = i - ((lower[i] - 0) / (lower[i] - lower[i-1]))
+            } else {
+              begin = i - ((upper[i] - 0) / (upper[i] - upper[i-1]))
+            }
+          }
+          prev = TRUE
+        } else {
+          if (prev) {
+            if (low[i-1]){
+              end = i + ((lower[i] - 0) / (lower[i] - lower[i-1]))
+            } else {
+              end = i + ((upper[i] - 0) / (upper[i] - upper[i-1]))
+            }
+            prev = FALSE
+            break
+          }
+        }
+      }
+
+      (end - begin) * measurement_interval
+    },
     get_all_variable_names = function() {
       "returns all variables in the var model"
       dimnames(var_model$y)[[2]]
     },
 
     .get_variable_name = function(id) {
+      "Returns a variable name based on its id"
       get_all_variable_names()[[id]]
     },
+
     .calculate_irf = function(variable_name, response = NULL, plot_results = FALSE){
+      "Calculates IRF and returns the total effect"
       resulting_score <- 0
+      result <- ''
       if (bootstrap_iterations > 0) {
         result <- vars::irf(var_model, impulse=variable_name,
                  response = response, n.ahead = horizon, cumulative= FALSE,
-                 boot = bootstrap_iterations, ortho = orthogonalize)
+                 boot=TRUE, runs = bootstrap_iterations, ortho = orthogonalize)
 
-        if (plot_results) plot(result)
         low <- (result$Lower[[variable_name]] * (result$Lower[[variable_name]] > 0))
         high <- (result$Upper[[variable_name]] * (result$Upper[[variable_name]] < 0))
         sign_effects <- (low + high)[, !dimnames(result$Lower[[variable_name]])[[2]] %in% variable_name]
         resulting_score <- sum(sign_effects)
       } else {
         result <- vars::irf(var_model, impulse=variable_name, response = response, n.ahead = horizon, cumulative= FALSE, ortho = orthogonalize, boot= FALSE)
-        if (plot_results) plot(result)
-        result <- result$irf[[variable_name]][, !dimnames(result$irf[[variable_name]])[[2]] %in% variable_name, drop=FALSE]
-        resulting_score <- as.numeric(colSums(result))
+        resulting_score <- result$irf[[variable_name]][, !dimnames(result$irf[[variable_name]])[[2]] %in% variable_name, drop=FALSE]
+        resulting_score <- as.numeric(colSums(resulting_score))
       }
+      if (plot_results) plot(result)
+
       resulting_score
     }
   )

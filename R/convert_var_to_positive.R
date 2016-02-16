@@ -1,5 +1,3 @@
-#' DON'T USE THIS METHOD, ITS INCORREC!
-
 #' Converts a var model to a positive notation, returns the updated var model
 #'
 #' @param var_model the var model that should be converted to positive
