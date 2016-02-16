@@ -53,6 +53,21 @@ test_that('determine_best_node_from_all', {
   })
 })
 
+test_that('determine_effect_network', {
+  test_that('Without autocorrelation', {
+    aira <- Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE)
+    result <- aira$determine_effect_network()
+    expect_equal(dim(result), c(2,2))
+
+    # No autocorrelation
+    expect_equal(result['SomBewegUur', 'SomBewegUur'], 0)
+    expect_equal(result['SomPHQ', 'SomPHQ'], 0)
+
+    expect_equal(result['SomBewegUur', 'SomPHQ'], -1.859704, tolerance=1e-5)
+    expect_equal(result['SomPHQ', 'SomBewegUur'], 0.1706285, tolerance=1e-5)
+  })
+})
+
 test_that('determine_percentage_effect', {
   test_that('with orthogonalization', {
     aira <- Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE)

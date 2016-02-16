@@ -23,6 +23,7 @@ Aira <- setRefClass('Aira',
       callSuper(bootstrap_iterations= bootstrap_iterations, horizon = horizon,
                 var_model = var_model, orthogonalize = orthogonalize)
     },
+
     determine_best_node_from_all = function() {
       "Returns the total effect a variable has on all other variables in the network.
       If bootstrap iterations provided to aira is 0, we will not run any bootstrapping.
@@ -33,6 +34,26 @@ Aira <- setRefClass('Aira',
         total[variable_name] <- .calculate_irf(variable_name)
       }
       total
+    },
+
+    determine_effect_network = function(include_autoregressive_effects = FALSE) {
+      "Returns the summed effect each node has on the other nodes node
+       @param include_autoregressive_effects if enabled, autoregressive effects are used (default FALSE). Not yet supported!"
+      K <- var_model$K
+      effect_matrix <- matrix(0, K, K)
+      colnames(effect_matrix) <- get_all_variable_names()
+      rownames(effect_matrix) <- get_all_variable_names()
+
+      for (variable in 1:var_model$K) {
+        for (response_name in 1:var_model$K) {
+          if (variable == response_name & !include_autoregressive_effects) next # Don't consider autocorrelation
+          variable_name <- .get_variable_name(variable)
+          response_name <- .get_variable_name(response_name)
+          result <- .calculate_irf(variable_name = variable_name, response = response_name)
+          effect_matrix[variable_name, response_name] <- result
+        }
+      }
+      effect_matrix
     },
 
     determine_percentage_effect  = function(variable_to_improve, percentage) {
