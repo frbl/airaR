@@ -16,7 +16,6 @@ myPsi.varest <-
     #sigma.u <- (crossprod(resid(x)) / (x$obs-14))
     P <- t(chol(sigma.u))
 
-    reverse_order <- FALSE
     if(reverse_order) {
       P <- t(P)
     }
@@ -36,4 +35,4 @@ override_function <- function(origfuncname,packagename,newfunc) {
   unlockBinding(origfuncname, getNamespace(packagename))
   assign(origfuncname, newfunc, getNamespace(packagename))
 }
-override_function("Psi.varest","vars",myPsi.varest)
+

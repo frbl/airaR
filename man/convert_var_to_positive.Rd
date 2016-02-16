@@ -4,12 +4,14 @@
 \alias{convert_var_to_positive}
 \title{Converts a var model to a positive notation, returns the updated var model}
 \usage{
-convert_var_to_positive(var_model, negative_variables)
+convert_var_to_positive(var_model, negative_variables, direction = "both")
 }
 \arguments{
 \item{var_model}{the var model that should be converted to positive}
 
 \item{negative_variables}{the variables that are negative, and should be positivised}
+
+\item{direction}{the direction to make positive (either outgoing, incomming or both (default))}
 }
 \value{
 the positivised var-model
