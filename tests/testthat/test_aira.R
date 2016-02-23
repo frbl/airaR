@@ -51,6 +51,7 @@ test_that('determine_best_node_from_all', {
     # Furthermore, they show that for order one, no significant effect exist from the somphq variables
     expect_equal(tot$SomPHQ, 0, tolerance=1e-5)
   })
+
 })
 
 test_that('determine_effect_network', {
@@ -113,7 +114,30 @@ test_that('determine_length_of_effect', {
 })
 
 test_that('.calculate_irf', {
-  skip("Not yet tested")
+  test_that('caching', {
+    test_that('it returns a same cached object the second time', {
+      aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE, reverse_order=FALSE)
+      .set_exo(testdata_var_model())
+      result1 <- aira$.calculate_irf(variable_name = 'SomBewegUur')
+      result2 <- aira$.calculate_irf(variable_name = 'SomBewegUur')
+      expect_equal(result1, result2)
+    })
+    test_that('it returns faster the second time because of caching', {
+      aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE, reverse_order=FALSE)
+      .set_exo(testdata_var_model())
+      start.time <- Sys.time()
+      result1 <- aira$.calculate_irf(variable_name = 'SomBewegUur')
+      end.time <- Sys.time()
+      duration_pre_caching <- end.time - start.time
+
+      start.time <- Sys.time()
+      result2 <- aira$.calculate_irf(variable_name = 'SomBewegUur')
+      end.time <- Sys.time()
+
+      duration_post_caching <- end.time - start.time
+      expect_less_than(100 * duration_post_caching, duration_pre_caching)
+    })
+  })
 })
 
 test_that('get_all_variable_names', {
