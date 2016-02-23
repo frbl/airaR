@@ -14,12 +14,17 @@ Aira <- setRefClass('Aira',
     "bootstrap_iterations",
     "horizon",
     "var_model",
-    "orthogonalize"
+    "orthogonalize",
+    "irf_cache"
   ),
   methods = list(
     initialize = function(bootstrap_iterations, horizon, var_model, orthogonalize, reverse_order=FALSE) {
+      # In order to allow for a reverse ordering in variables, we have to override a function in the vars package.
+      # This is done here. Note the fact that the reverse order var is stored in a global variable. This is due to
+      # The fact that we are not calling the function directly, and thus cannot pass an argument to it.
       assign('reverse_order', reverse_order, envir= .GlobalEnv)
       override_function("Psi.varest","vars",myPsi.varest)
+      irf_cache <<- list()
       callSuper(bootstrap_iterations= bootstrap_iterations, horizon = horizon,
                 var_model = var_model, orthogonalize = orthogonalize)
     },
@@ -145,6 +150,11 @@ Aira <- setRefClass('Aira',
       "Calculates IRF and returns the total effect"
       resulting_score <- 0
       result <- ''
+      key <- paste(variable_name, response, "|")
+
+      # If we have processed this call before, return it from the cache
+      if((key %in% names(irf_cache)) & !plot_results) return(irf_cache[[key]])
+
       if (bootstrap_iterations > 0) {
         result <- vars::irf(var_model, impulse=variable_name,
                  response = response, n.ahead = horizon, cumulative= FALSE,
@@ -161,6 +171,7 @@ Aira <- setRefClass('Aira',
       }
       if (plot_results) plot(result)
 
+      irf_cache[key] <<- resulting_score
       resulting_score
     }
   )
