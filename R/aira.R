@@ -1,11 +1,9 @@
-#rm(list=ls(pos='.GlobalEnv',all=TRUE),pos='.GlobalEnv')
 #' The aira main class.
 #'
 #' @field bootstrap_iterations the number of bootstrap iterations to do for determining the significance of the effects
 #' @field horizon the number of steps to look in the future
 #' @field var_model the var model to perform the calculations on
 #' @field orthogonalize use orthogonalized IRF
-#' @importFrom vars VAR irf Bcoef Phi
 #' @importFrom methods setRefClass
 #' @export Aira
 #' @exportClass Aira
@@ -15,16 +13,19 @@ Aira <- setRefClass('Aira',
     "horizon",
     "var_model",
     "orthogonalize",
-    "irf_cache"
+    "irf_cache",
+    "vars_functions"
   ),
   methods = list(
     initialize = function(bootstrap_iterations, horizon, var_model, orthogonalize, reverse_order=FALSE) {
-      # In order to allow for a reverse ordering in variables, we have to override a function in the vars package.
-      # This is done here. Note the fact that the reverse order var is stored in a global variable. This is due to
-      # The fact that we are not calling the function directly, and thus cannot pass an argument to it.
-      assign('reverse_order', reverse_order, envir= .GlobalEnv)
-      override_function("Psi.varest","vars",myPsi.varest)
+      #rm(list=ls(pos='.GlobalEnv',all=TRUE),pos='.GlobalEnv')
       irf_cache <<- list()
+      vars_functions <<- VarsFunctions$new(bootstrap_iterations = bootstrap_iterations,
+                                           horizon = horizon,
+                                           var_model = var_model,
+                                           orthogonalize = orthogonalize,
+                                           reverse_order = reverse_order
+                                           )
       callSuper(bootstrap_iterations= bootstrap_iterations, horizon = horizon,
                 var_model = var_model, orthogonalize = orthogonalize)
     },
@@ -77,7 +78,6 @@ Aira <- setRefClass('Aira',
           total[variable_name] <- Inf
           next
         }
-
         needed_difference <- mean(var_model$y[,variable_to_improve]) * (percentage / 100)
         needed_difference <- needed_difference / effect
         needed_difference <- needed_difference / mean(var_model$y[,variable_name])
@@ -87,19 +87,14 @@ Aira <- setRefClass('Aira',
       total
     },
 
-    determine_length_of_effect = function(variable_name, response, measurement_interval) {
+    determine_length_of_effect = function(variable_name, response, measurement_interval, first_effect_only=FALSE) {
       "Returns the time in minues a variable is estimated to have an effect on another variable.
       @param variable_to_shock the name of the variable to receive the shock
       @param variable_to_respond the name of the variable to respond to the shock
       @param measurement interval the time in minutes between two measurements"
 
       if(bootstrap_iterations <= 0) stop('Bootstrapping is needed for this function.')
-
-      result <- vars::irf(var_model, impulse=variable_name,
-                          response = response, n.ahead = horizon, cumulative= FALSE,
-                          runs = bootstrap_iterations, boot=TRUE, ortho = orthogonalize)
-
-
+      result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
 
       lower <- result$Lower[[variable_name]]
       upper <- result$Upper[[variable_name]]
@@ -107,34 +102,35 @@ Aira <- setRefClass('Aira',
       low <- (lower > 0)
       high <- (upper < 0)
       begin <- 1
-      end <- -1
-      prev <- FALSE
+      end <- begin
+      effect_started <- FALSE
+      total_length = 0
 
       for (i in 1:horizon) {
         if (low[i] | high[i]) {
           # If the beginning of the effect is not on the first measurement, we should interpolate.
-          if (i > 1 & !prev) {
+          if (i > 1 & !effect_started) {
             if (low[i]){
               begin = i - ((lower[i] - 0) / (lower[i] - lower[i-1]))
-            } else {
+            } else { # high[i] == true
               begin = i - ((upper[i] - 0) / (upper[i] - upper[i-1]))
             }
           }
-          prev = TRUE
+          effect_started = TRUE
         } else {
-          if (prev) {
+          if (effect_started) {
             if (low[i-1]){
               end = i + ((lower[i] - 0) / (lower[i] - lower[i-1]))
-            } else {
+            } else { # high[i-1] == true
               end = i + ((upper[i] - 0) / (upper[i] - upper[i-1]))
             }
-            prev = FALSE
-            break
+            effect_started = FALSE
+            total_length <- total_length + (end - begin)
+            if(first_effect_only) break
           }
         }
       }
-
-      (end - begin) * measurement_interval
+      total_length * measurement_interval
     },
     get_all_variable_names = function() {
       "returns all variables in the var model"
@@ -150,22 +146,20 @@ Aira <- setRefClass('Aira',
       "Calculates IRF and returns the total effect"
       resulting_score <- 0
       result <- ''
-      key <- paste(variable_name, response, "|")
+      key <- paste(variable_name, response, sep="|")
 
       # If we have processed this call before, return it from the cache
       if((key %in% names(irf_cache)) & !plot_results) return(irf_cache[[key]])
 
       if (bootstrap_iterations > 0) {
-        result <- vars::irf(var_model, impulse=variable_name,
-                 response = response, n.ahead = horizon, cumulative= FALSE,
-                 boot=TRUE, runs = bootstrap_iterations, ortho = orthogonalize)
+        result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
 
         low <- (result$Lower[[variable_name]] * (result$Lower[[variable_name]] > 0))
         high <- (result$Upper[[variable_name]] * (result$Upper[[variable_name]] < 0))
         sign_effects <- (low + high)[, !dimnames(result$Lower[[variable_name]])[[2]] %in% variable_name]
         resulting_score <- sum(sign_effects)
       } else {
-        result <- vars::irf(var_model, impulse=variable_name, response = response, n.ahead = horizon, cumulative= FALSE, ortho = orthogonalize, boot= FALSE)
+        result <- vars_functions$irf(from=variable_name, to=response)
         resulting_score <- result$irf[[variable_name]][, !dimnames(result$irf[[variable_name]])[[2]] %in% variable_name, drop=FALSE]
         resulting_score <- as.numeric(colSums(resulting_score))
       }
