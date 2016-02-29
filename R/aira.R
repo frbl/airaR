@@ -38,7 +38,7 @@ Aira <- setRefClass('Aira',
       total <- list()
       for (variable in 1:var_model$K) {
         variable_name <- .get_variable_name(variable)
-        total[variable_name] <- .calculate_irf(variable_name)
+        total[[variable_name]] <- .calculate_irf(variable_name)
       }
       total
     },
@@ -76,14 +76,14 @@ Aira <- setRefClass('Aira',
 
         effect <- .calculate_irf(variable_name, variable_to_improve)
         if (abs(effect) < 0.0001) {
-          total[variable_name] <- Inf
+          total[[variable_name]] <- Inf
           next
         }
         needed_difference <- mean(var_model$y[,variable_to_improve]) * (percentage / 100)
         needed_difference <- needed_difference / effect
         needed_difference <- needed_difference / mean(var_model$y[,variable_name])
 
-        total[variable_name] <- needed_difference
+        total[[variable_name]] <- needed_difference
       }
       total
     },
@@ -166,7 +166,7 @@ Aira <- setRefClass('Aira',
       }
       if (plot_results) plot(result)
 
-      irf_cache[key] <<- resulting_score
+      irf_cache[[key]] <<- resulting_score
       resulting_score
     }
   )
