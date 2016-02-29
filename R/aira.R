@@ -14,10 +14,11 @@ Aira <- setRefClass('Aira',
     "var_model",
     "orthogonalize",
     "irf_cache",
-    "vars_functions"
+    "vars_functions",
+    "name"
   ),
   methods = list(
-    initialize = function(bootstrap_iterations, horizon, var_model, orthogonalize, reverse_order=FALSE) {
+    initialize = function(bootstrap_iterations, horizon, var_model, orthogonalize, name="", reverse_order=FALSE) {
       #rm(list=ls(pos='.GlobalEnv',all=TRUE),pos='.GlobalEnv')
       irf_cache <<- list()
       vars_functions <<- VarsFunctions$new(bootstrap_iterations = bootstrap_iterations,
@@ -27,7 +28,7 @@ Aira <- setRefClass('Aira',
                                            reverse_order = reverse_order
                                            )
       callSuper(bootstrap_iterations= bootstrap_iterations, horizon = horizon,
-                var_model = var_model, orthogonalize = orthogonalize)
+                var_model = var_model, orthogonalize = orthogonalize, name = name)
     },
 
     determine_best_node_from_all = function() {
