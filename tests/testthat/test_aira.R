@@ -1,5 +1,5 @@
 context('aira')
-
+fast = FALSE
 .set_exo <- function(model) {
   # This is terrible practice. Irf requires the exogen matrix to be available, which is not available anymore.
   # Here we recreate the matrix by padding the datamat with zeros.
@@ -32,15 +32,46 @@ testdata_var_model <- function() {
   var.2c
 }
 
+testdata_multiple_variables <- function() {
+  data(Canada, package='vars')
+  data_set <- Canada
+  var.2c <- vars::VAR(data_set, p=2, type='both')
+  var.2c
+}
+
 test_that('determine_best_node_from_all', {
   test_that('it returns the total effect of a variable on the other variables', {
-    .set_exo(testdata_var_model())
-    aira <- Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE)
-    tot <- aira$determine_best_node_from_all()
+    test_that('Rosmalen', {
+      .set_exo(testdata_var_model())
+      aira <- Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE)
+      tot <- aira$determine_best_node_from_all()
 
-    expect_equal(tot$SomBewegUur, -2.32155, tolerance=1e-5)
-    expect_equal(tot$SomPHQ, 0, tolerance=1e-5)
+      expect_equal(tot$SomBewegUur, -2.32155, tolerance=1e-5)
+      expect_equal(tot$SomPHQ, 0, tolerance=1e-5)
+    })
+    test_that('Canada', {
+      aira <- Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = testdata_multiple_variables(), orthogonalize= TRUE)
+      tot <- aira$determine_best_node_from_all()
+
+      # Values have been copy pasted. just to check if the DF is complete
+      expect_true('e' %in% names(tot))
+      expect_true('prod' %in% names(tot))
+      expect_true('U' %in% names(tot))
+      expect_true('rw' %in% names(tot))
+
+      expect_true(class(tot$e) == 'numeric')
+      expect_true(class(tot$prod) == 'numeric')
+      expect_true(class(tot$U) == 'numeric')
+      expect_true(class(tot$rw) == 'numeric')
+
+      expect_equal(tot$e, -1.674678, tolerance=1e-5)
+      expect_equal(tot$rw, -2.166623, tolerance=1e-5)
+      expect_equal(tot$prod, -0.9059553, tolerance=1e-5)
+      expect_equal(tot$U, 3.49601, tolerance=1e-5)
+    })
+
   })
+
 
   test_that('it returns the total effect of a variable on the other variables, also without orthogonalization', {
     .set_exo(testdata_var_model())
@@ -53,21 +84,38 @@ test_that('determine_best_node_from_all', {
   })
 
   test_that('it can use bootstrapping to return the total significant effect of a variable on the other variables', {
-    aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE)
-    tot <- aira$determine_best_node_from_all()
+    test_that('Rosmalen', {
+      if(fast) skip('Takes too long')
+      aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE)
+      tot <- aira$determine_best_node_from_all()
 
-    # According to the Rosmalen paper, in this model we would expect a significant NEGATIVE effect
-    # from sombeweguur on the som phq variable. The effect is rather large, i.e. < -.15 (i.e. order 1)
+      # According to the Rosmalen paper, in this model we would expect a significant NEGATIVE effect
+      # from sombeweguur on the som phq variable. The effect is rather large, i.e. < -.15 (i.e. order 1)
 
-    # Because of the low number of iterations, the results might vary
-    # with 1000 bootstraps the result is more or less stable, and around .4, but this takes a lot of time
-    expect_lt(tot$SomBewegUur, -0.03)
-    expect_gt(tot$SomBewegUur, -0.10)
+      # Because of the low number of iterations, the results might vary
+      # with 1000 bootstraps the result is more or less stable, and around .4, but this takes a lot of time
+      expect_lt(tot$SomBewegUur, -0.03)
+      expect_gt(tot$SomBewegUur, -0.10)
 
-    # Furthermore, they show that for order one, no significant effect exist from the somphq variables
-    expect_equal(tot$SomPHQ, 0, tolerance=1e-5)
+      # Furthermore, they show that for order one, no significant effect exist from the somphq variables
+      expect_equal(tot$SomPHQ, 0, tolerance=1e-5)
+    })
+
+    test_that('Canada', {
+      aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = testdata_multiple_variables(), orthogonalize= TRUE)
+      tot <- aira$determine_best_node_from_all()
+      # Values have been copy pasted. just to check if the DF is complete
+      expect_true('e' %in% names(tot))
+      expect_true('prod' %in% names(tot))
+      expect_true('U' %in% names(tot))
+      expect_true('rw' %in% names(tot))
+
+      expect_true(class(tot$e) == 'numeric')
+      expect_true(class(tot$prod) == 'numeric')
+      expect_true(class(tot$U) == 'numeric')
+      expect_true(class(tot$rw) == 'numeric')
+    })
   })
-
 })
 
 test_that('determine_effect_network', {
@@ -143,6 +191,7 @@ test_that('determine_percentage_effect', {
 
 ## HERE WE REPLECATE THE ROSMALEN EXPERIMENT
 test_that('determine_length_of_effect', {
+  if(fast) skip('Takes too long')
   variable_to_shock = 'SomBewegUur'
   variable_to_respond = 'SomPHQ'
   aira <- Aira$new(bootstrap_iterations = 2000, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE, reverse_order=FALSE)
@@ -162,6 +211,7 @@ test_that('determine_length_of_effect', {
 test_that('.calculate_irf', {
   test_that('caching', {
     test_that('it returns a same cached object the second time', {
+      if(fast) skip('Takes too long')
       aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE, reverse_order=FALSE)
       .set_exo(testdata_var_model())
       result1 <- aira$.calculate_irf(variable_name = 'SomBewegUur')
@@ -170,6 +220,7 @@ test_that('.calculate_irf', {
     })
 
     test_that('it returns faster the second time because of caching', {
+      if(fast) skip('Takes too long')
       aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE, reverse_order=FALSE)
       .set_exo(testdata_var_model())
       start.time <- Sys.time()

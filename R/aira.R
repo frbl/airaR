@@ -38,7 +38,13 @@ Aira <- setRefClass('Aira',
       total <- list()
       for (variable in 1:var_model$K) {
         variable_name <- .get_variable_name(variable)
-        total[[variable_name]] <- .calculate_irf(variable_name)
+        total[[variable_name]] <- 0
+        for (response_name in 1:var_model$K) {
+          if (variable == response_name) next
+          response_name <- .get_variable_name(response_name)
+          irf <- .calculate_irf(variable_name=variable_name, response=response_name)
+          total[[variable_name]] <- total[[variable_name]] + irf
+        }
       }
       total
     },
@@ -52,9 +58,9 @@ Aira <- setRefClass('Aira',
       rownames(effect_matrix) <- get_all_variable_names()
 
       for (variable in 1:var_model$K) {
+        variable_name <- .get_variable_name(variable)
         for (response_name in 1:var_model$K) {
           if (variable == response_name & !include_autoregressive_effects) next # Don't consider autocorrelation
-          variable_name <- .get_variable_name(variable)
           response_name <- .get_variable_name(response_name)
           result <- .calculate_irf(variable_name = variable_name, response = response_name)
           effect_matrix[variable_name, response_name] <- result
@@ -150,11 +156,9 @@ Aira <- setRefClass('Aira',
       key <- paste(variable_name, response, sep="|")
 
       # If we have processed this call before, return it from the cache
-      if((key %in% names(irf_cache)) & !plot_results) return(irf_cache[[key]])
-
+      #if((key %in% names(irf_cache)) & !plot_results) return(irf_cache[[key]])
       if (bootstrap_iterations > 0) {
         result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
-
         low <- (result$Lower[[variable_name]] * (result$Lower[[variable_name]] > 0))
         high <- (result$Upper[[variable_name]] * (result$Upper[[variable_name]] < 0))
         sign_effects <- (low + high)[, !dimnames(result$Lower[[variable_name]])[[2]] %in% variable_name]
