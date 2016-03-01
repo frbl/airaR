@@ -8,6 +8,13 @@ testdata_aira_model <- function() {
   Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = var_model, orthogonalize= TRUE)
 }
 
+testdata_multiple_variables <- function() {
+  data(Canada, package='vars')
+  data_set <- Canada
+  var.2c <- vars::VAR(data_set, p=2, type='both')
+  Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = var.2c, orthogonalize= TRUE)
+}
+
 test_that('print_overview_percentage_effect', {
   aira_output <- AiraOutput$new(aira = testdata_aira_model())
   result <- aira_output$print_overview_percentage_effect(10)
@@ -26,49 +33,56 @@ test_that('print_percentage_effect', {
 })
 
 test_that('export_model', {
-  json_example ='{
+  test_that('Rosmalen', {
+    json_example ='{
   "links": [
-  {
-  "source": 0,
-  "target": 1,
-  "distance": 0.9,
-  "weight": "-0.258619869521396"
-  }
-  ],
-  "nodes": [
-  {
-  "index": 0,
-  "name": "SomBewegUur",
-  "key": "SomBewegUur",
-  "val": -1.8597041
-  },
-  {
-  "index": 1,
-  "name": "SomPHQ",
-  "key": "SomPHQ",
-  "val": 0.1706285
-  }
-  ]
-}'
+    {
+    "source": 0,
+    "target": 1,
+    "distance": 0.9,
+    "weight": "-0.258619869521396"
+    }
+    ],
+    "nodes": [
+    {
+    "index": 0,
+    "name": "SomBewegUur",
+    "key": "SomBewegUur",
+    "val": -1.8597041
+    },
+    {
+    "index": 1,
+    "name": "SomPHQ",
+    "key": "SomPHQ",
+    "val": 0.1706285
+    }
+    ]
+  }'
 
-  edges <- data.frame(source = 0,
-                      target = 1,
-                      distance = 0.9,
-                      weight = "-0.258619869521396",
-                      stringsAsFactors=FALSE
-                      )
+    edges <- data.frame(source = 0,
+                        target = 1,
+                        distance = 0.9,
+                        weight = "-0.258619869521396",
+                        stringsAsFactors=FALSE
+    )
 
-  nodes <- data.frame(index = c(0, 1),
-                      name = c('SomBewegUur', 'SomPHQ'),
-                      key = c('SomBewegUur', 'SomPHQ'),
-                      val = c(-1.8597041, 0.1706285),
-                      stringsAsFactors=FALSE
-  )
-  expected <- list(links = edges, nodes = nodes)
+    nodes <- data.frame(index = c(0, 1),
+                        name = c('SomBewegUur', 'SomPHQ'),
+                        key = c('SomBewegUur', 'SomPHQ'),
+                        val = c(-1.8597041, 0.1706285),
+                        stringsAsFactors=FALSE
+    )
+    expected <- list(links = edges, nodes = nodes)
 
-  aira_output <- AiraOutput$new(aira = testdata_aira_model())
-  result <- aira_output$export_model()
-  expect_equal(result, expected, tolerance=1e-5)
+    aira_output <- AiraOutput$new(aira = testdata_aira_model())
+    result <- aira_output$export_model()
+    expect_equal(result, expected, tolerance=1e-5)
+  })
+  test_that('Canada', {
+    aira_output <- AiraOutput$new(aira = testdata_multiple_variables())
+    result <- aira_output$export_model()
+    print(result)
+  })
 })
 
 test_that('export_model_to_json', {
