@@ -1,5 +1,5 @@
 context('aira')
-fast = FALSE
+fast = TRUE
 .set_exo <- function(model) {
   # This is terrible practice. Irf requires the exogen matrix to be available, which is not available anymore.
   # Here we recreate the matrix by padding the datamat with zeros.
@@ -102,6 +102,7 @@ test_that('determine_best_node_from_all', {
     })
 
     test_that('Canada', {
+      if(fast) skip('Takes too long')
       aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = testdata_multiple_variables(), orthogonalize= TRUE)
       tot <- aira$determine_best_node_from_all()
       # Values have been copy pasted. just to check if the DF is complete

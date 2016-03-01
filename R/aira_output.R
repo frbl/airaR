@@ -43,11 +43,15 @@ AiraOutput <- setRefClass(
       "Exports the effects of all variables in the network"
       network <- .generate_network()
       scores <- aira$determine_best_node_from_all()
+
+      # Put the results in a list, so we can change the complete column of the dataframe in
+      # one statement
       val <- c()
       for(i in 1:nrow(network$nodes)) {
         node <- network$nodes[i,]
         val <- c(val, scores[[node$name]])
       }
+
       network$nodes$val <- val
       network
     },
