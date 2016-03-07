@@ -118,7 +118,7 @@ AiraOutput <- setRefClass(
         eqsum <- summary(equation)
         eqname <- var_names[i]
         for (fromnodename in var_names) {
-          if (fromnodename == eqname & !autoregressive) next
+          if (autoregressive || fromnodename == eqname) next
           any_pval_significant <- FALSE
           significant_lag <- -1
 
