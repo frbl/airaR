@@ -55,9 +55,27 @@ AiraOutput <- setRefClass(
       network$nodes$val <- val
       network
     },
+
     export_model_to_json = function() {
       "Exports the effects of all variables in the network in a JSON structure, that can be interpreted by the AIRA JS library"
       toJSON(export_model())
+    },
+
+    export_var_network = function() {
+      "Exports the coefficients of all variables in the network"
+      network <- .generate_network()
+      names <- dimnames(aira$var_model$y)[[2]]
+      output_network <- create_result_matrix(names = names)
+
+      for (i in 1:length(network$links)) {
+        link <- network$links[i,]
+        if (is.na(link$source)) next
+        source <- network$nodes[network$nodes$index == link$source, 'name']
+        target <- network$nodes[network$nodes$index == link$target, 'name']
+        weight<- as.numeric(link$weight)
+        output_network[source, target] <- output_network[source, target] + weight
+      }
+      output_network
     },
     .determine_effects = function(percentage_effects, result, variable_to_improve, percentage_to_improve) {
       for (name in names(percentage_effects)) {
