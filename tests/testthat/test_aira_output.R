@@ -85,6 +85,28 @@ test_that('export_model', {
   })
 })
 
+test_that('export_var_network', {
+  aira <- testdata_multiple_variables()
+  aira_output <- AiraOutput$new(aira = aira)
+
+  result <- aira_output$export_var_network()
+  number_of_vars <- dim(aira$var_model$y)[2]
+  expect_equal(dim(result), c(number_of_vars, number_of_vars))
+  names <- dimnames(aira$var_model$y)[[2]]
+  expect_equal(dimnames(result)[[1]], names)
+  expect_equal(dimnames(result)[[2]], names)
+
+  # Check the coefficients
+  expect_equal(result[[2,1]], 0.171649253388995)
+  expect_equal(result[[4,2]], 0.890614697744068)
+  expect_equal(result[[1,4]], -0.576101035159176)
+  result[[2,1]] <- 0
+  result[[4,2]] <- 0
+  result[[1,4]] <- 0
+  print(unname(result))
+  expect_equal(unname(result), matrix(0,number_of_vars,number_of_vars))
+})
+
 test_that('export_model_to_json', {
   json_example ='{
   "links": [
