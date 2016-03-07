@@ -129,7 +129,7 @@ AiraOutput <- setRefClass(
             any_pval_significant <- any_pval_significant | (p_val <= 0.05)
 
             # The first significant lag is considered the most important, and is used for plotting the coef
-            if (significant_lag == -1 & p_val <= 0.05) significant_lag <- lag
+            if (significant_lag == -1 && p_val <= 0.05) significant_lag <- lag
           }
           if (!any_pval_significant) next
 
