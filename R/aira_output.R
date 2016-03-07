@@ -64,9 +64,7 @@ AiraOutput <- setRefClass(
     export_var_network = function(autoregressive = FALSE) {
       "Exports the coefficients of all variables in the network"
       network <- .generate_network(autoregressive)
-      print(network)
       names <- dimnames(aira$var_model$y)[[2]]
-      print(names)
       output_network <- create_result_matrix(names = names)
 
       for (i in nrow(network$links)) {
@@ -74,8 +72,6 @@ AiraOutput <- setRefClass(
         if (is.na(link$source)) next
         source <- network$nodes[network$nodes$index == link$source, 'key']
         target <- network$nodes[network$nodes$index == link$target, 'key']
-        print(source)
-        print(target)
         weight<- as.numeric(link$weight)
         output_network[source, target] <- output_network[source, target] + weight
       }
