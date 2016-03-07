@@ -69,8 +69,7 @@ AiraOutput <- setRefClass(
       print(names)
       output_network <- create_result_matrix(names = names)
 
-      for (i in 1:length(network$links)) {
-        link <- network$links[i,]
+      for (link in network$links) {
         if (is.na(link$source)) next
         source <- network$nodes[network$nodes$index == link$source, 'key']
         target <- network$nodes[network$nodes$index == link$target, 'key']
