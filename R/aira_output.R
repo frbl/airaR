@@ -63,7 +63,7 @@ AiraOutput <- setRefClass(
 
     export_var_network = function(autoregressive = FALSE) {
       "Exports the coefficients of all variables in the network"
-      network <- .generate_network()
+      network <- .generate_network(autoregressive)
       names <- dimnames(aira$var_model$y)[[2]]
       output_network <- create_result_matrix(names = names)
 
