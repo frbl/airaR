@@ -61,7 +61,7 @@ AiraOutput <- setRefClass(
       toJSON(export_model())
     },
 
-    export_var_network = function() {
+    export_var_network = function(autoregressive = FALSE) {
       "Exports the coefficients of all variables in the network"
       network <- .generate_network()
       names <- dimnames(aira$var_model$y)[[2]]
@@ -86,7 +86,7 @@ AiraOutput <- setRefClass(
       }
       result
     },
-    .generate_network = function() {
+    .generate_network = function(autoregressive = FALSE) {
       varres <- aira$var_model$varresult
 
       var_names <- names(varres)
@@ -118,7 +118,7 @@ AiraOutput <- setRefClass(
         eqsum <- summary(equation)
         eqname <- var_names[i]
         for (fromnodename in var_names) {
-          if (fromnodename == eqname) next
+          if (fromnodename == eqname & !autoregressive) next
           any_pval_significant <- FALSE
           significant_lag <- -1
 
