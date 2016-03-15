@@ -68,12 +68,14 @@ d <- melt(real_data, id="x")
 real_plot <- ggplot(aes(x=x, value, colour=variable), data=d, show_guide = TRUE) +
   geom_line()+
   scale_colour_manual(values=c("lightblue", "black", 'forestgreen','orange','darkblue','pink'))+
-  annotate('text', x=0.1,y=1.3, label='Shock \non agitation')+
-  annotate('pointrange', x=0,y=1, ymin=-.2, ymax=1.1, size=.3, colour='red')+
+  annotate('text', x=0,y=1.4, label='Shock \non agitation')+
+  annotate('pointrange', x=0,y=1, ymin=-.2, ymax=1.15, size=.5, colour='red')+
+  annotate('segment', x=-.6,y=1.15, yend=1.15, xend=.6, size=.5, colour='red')+
   theme(legend.background = element_rect(colour="white"))+
   theme(panel.background = element_rect(fill = 'transparent', size=0)) +
   theme(legend.key =       element_rect(fill = "white", colour = "white"))+
   labs(x = "Horizon (Time steps)", y = "Response (Yt - d)") +
+  theme(text = element_text(size=14))+
   scale_x_continuous(breaks = round(seq(min(test_data$x), max(test_data$x), by = 1),1))+
   theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank()) +
   theme(panel.grid.major.y = element_line(colour="gray"), panel.grid.minor.y = element_blank()) +

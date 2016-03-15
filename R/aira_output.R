@@ -18,9 +18,11 @@ AiraOutput <- setRefClass(
         percentage_effects <- aira$determine_percentage_effect(variable_to_improve = variable_to_improve, percentage_to_improve)
         if (length(percentage_effects) > 0) {
           if(result == "") result <- paste(result, 'Effect achieved:\n', sep= "")
-          result <- .determine_effects(percentage_effects=percentage_effects, result = result,
+          result <- .determine_effects(percentage_effects = percentage_effects,
+                                       result = result,
                                        variable_to_improve = variable_to_improve,
-                                       percentage_to_improve = percentage_to_improve)
+                                       percentage_to_improve = percentage_to_improve,
+                                       print_newlines = TRUE)
         }
       }
       result
@@ -32,11 +34,13 @@ AiraOutput <- setRefClass(
       result <- ""
       percentage_effects <- aira$determine_percentage_effect(variable_to_improve = variable_to_improve, percentage_to_improve)
       if (length(percentage_effects) > 0) {
-        if(print_title)
+        if (print_title) {
           result <- paste(result, 'Effect achieved:', sep= "")
-          if(print_newlines) paste(result, '\n', sep= "")
-        else
+          separator <- ifelse(print_newlines, '\n', ' ')
+          result <- paste(result, separator, sep = "")
+        } else {
           result <- ""
+        }
 
         result <- .determine_effects(percentage_effects=percentage_effects, result = result,
                                      variable_to_improve = variable_to_improve,
@@ -90,14 +94,25 @@ AiraOutput <- setRefClass(
     },
 
     .determine_effects = function(percentage_effects, result, variable_to_improve, percentage_to_improve, print_newlines) {
+      index <- 0
       for (name in names(percentage_effects)) {
+        index <- index + 1
         if(percentage_effects == Inf || percentage_effects == -Inf) next
         effect <- round(percentage_effects[[name]] * 100)
         direction <- ifelse(sign(effect) == 1, "increasing", "decreasing")
         direction_improvement <- ifelse(sign(percentage_to_improve) == 1, "increase", "decrease")
         result <- paste(result, "You could ",direction_improvement," your ", variable_to_improve, " with ", abs(percentage_to_improve), '% ', sep ="")
-        result <- paste(result, "by ", direction, " your ", name, " with ", abs(effect), '%', sep ="")
-        paste(result, ifelse(print_newlines, '\n', ', '))
+        result <- paste(result, "by ", direction, " your ", name, " with ", abs(effect), '%', sep = "")
+        if (print_newlines) {
+          result <- paste(result, '\n', sep = "")
+        } else {
+          # Don't add a comma to the end.
+          if (index == length(names)) {
+            result <- paste(result, '.', sep = "")
+          } else {
+            result <- paste(result, ', ', sep = "")
+          }
+        }
       }
       result
     },

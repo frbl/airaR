@@ -29,6 +29,7 @@ plotje <- ggplot(data=test_data,aes(x=x, y=out), show_guide = FALSE) +
   theme(panel.background = element_rect(fill = 'transparent', size=0)) +
   theme(legend.key =       element_rect(fill = "white", colour = "white"))+
   labs(x = "Horizon (Time steps)", y = "Response (Yt - d)")+
+  theme(text = element_text(size=14))+
   theme(legend.position = "none") +
   scale_x_continuous(breaks = round(seq(min(test_data$x), max(test_data$x), by = 1),1))+
   theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank()) +
