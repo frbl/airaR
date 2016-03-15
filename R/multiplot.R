@@ -4,12 +4,16 @@
 #' then plot 1 will go in the upper left, 2 will go in the upper right, and
 #' 3 will go all the way across the bottom.
 #'
-#' @param ... ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+#' @param ... ggplot objects can be passed in ..., or to
+#' @param plotlist (as a list of ggplot objects)
 #' @param cols Number of columns in layout
 #' @param layout A matrix specifying the layout. If present, 'cols' is ignored.
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  library(grid)
-
+#' @importFrom grid grid.newpage
+#' @importFrom grid grid.layout
+#' @importFrom grid pushViewport
+#' @importFrom grid viewport
+#' @export
+multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL) {
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
 

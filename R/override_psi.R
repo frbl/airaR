@@ -1,3 +1,4 @@
+globalVariables(c("reverse_order"))
 myPsi.varest <-
   function(x, nstep=10, ...){
     if(!(class(x)=="varest")){

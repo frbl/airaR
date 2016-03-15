@@ -16,7 +16,9 @@ Depends:
 Suggests:
     testthat,
     roxygen2,
-    autovar
+    autovar,
+    ggplot2,
+    grid
 Imports:
     vars,
     jsonlite

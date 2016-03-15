@@ -103,7 +103,6 @@ test_that('export_var_network', {
   result[[2,1]] <- 0
   result[[4,2]] <- 0
   result[[1,4]] <- 0
-  print(unname(result))
   expect_equal(unname(result), matrix(0,number_of_vars,number_of_vars))
 })
 

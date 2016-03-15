@@ -25,17 +25,23 @@ AiraOutput <- setRefClass(
       }
       result
     },
-    print_percentage_effect = function(variable_to_improve, percentage_to_improve = 10) {
+    print_percentage_effect = function(variable_to_improve, percentage_to_improve = 10, print_newlines = FALSE, print_title=FALSE) {
       "Prints the percentage increases needed for a specific variable.
       @param variable_to_improve the actuabl variable to improve
       @param percentage_to_improve the percentage to improve the variable with (default 10 percent)"
       result <- ""
       percentage_effects <- aira$determine_percentage_effect(variable_to_improve = variable_to_improve, percentage_to_improve)
       if (length(percentage_effects) > 0) {
-        result <- paste(result, 'Effect achieved:\n', sep= "")
+        if(print_title)
+          result <- paste(result, 'Effect achieved:', sep= "")
+          if(print_newlines) paste(result, '\n', sep= "")
+        else
+          result <- ""
+
         result <- .determine_effects(percentage_effects=percentage_effects, result = result,
                                      variable_to_improve = variable_to_improve,
-                                     percentage_to_improve = percentage_to_improve)
+                                     percentage_to_improve = percentage_to_improve,
+                                     print_newlines = print_newlines)
       }
       result
     },
@@ -65,24 +71,33 @@ AiraOutput <- setRefClass(
       "Exports the coefficients of all variables in the network"
       network <- .generate_network(autoregressive)
       names <- dimnames(aira$var_model$y)[[2]]
-      output_network <- create_result_matrix(names = names)
+      .convert_to_matrix(nodes = network$nodes, links = network$links, names=names)
+    },
 
-      for (i in 1:nrow(network$links)) {
-        link <- network$links[i,]
+    .convert_to_matrix = function(nodes, links, names){
+      "Convert the two matrices of links and lists to a single adjacency matrix"
+      output_network <- create_result_matrix(names = names)
+      if(is.null(links)) return(output_network)
+      for (i in 1:nrow(links)) {
+        link <- links[i,]
         if (is.na(link$source)) next
-        source <- network$nodes[network$nodes$index == link$source, 'key']
-        target <- network$nodes[network$nodes$index == link$target, 'key']
-        weight<- as.numeric(link$weight)
+        source <- nodes[nodes$index == link$source, 'key']
+        target <- nodes[nodes$index == link$target, 'key']
+        weight <- as.numeric(link$weight)
         output_network[source, target] <- output_network[source, target] + weight
       }
       output_network
     },
-    .determine_effects = function(percentage_effects, result, variable_to_improve, percentage_to_improve) {
+
+    .determine_effects = function(percentage_effects, result, variable_to_improve, percentage_to_improve, print_newlines) {
       for (name in names(percentage_effects)) {
+        if(percentage_effects == Inf || percentage_effects == -Inf) next
         effect <- round(percentage_effects[[name]] * 100)
         direction <- ifelse(sign(effect) == 1, "increasing", "decreasing")
-        result <- paste(result, "You could increase your ", variable_to_improve, " with ", percentage_to_improve, '% ', sep ="")
-        result <- paste(result, "by ", direction, " your ", name, " with ", abs(effect), '%\n', sep ="")
+        direction_improvement <- ifelse(sign(percentage_to_improve) == 1, "increase", "decrease")
+        result <- paste(result, "You could ",direction_improvement," your ", variable_to_improve, " with ", abs(percentage_to_improve), '% ', sep ="")
+        result <- paste(result, "by ", direction, " your ", name, " with ", abs(effect), '%', sep ="")
+        paste(result, ifelse(print_newlines, '\n', ', '))
       }
       result
     },
