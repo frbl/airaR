@@ -26,7 +26,11 @@ The aira main class.
 If bootstrap iterations provided to aira is 0, we will not run any bootstrapping.
 If bootstrap iterations >0, we will only consider the significant effects in the response}
 
-\item{\code{determine_length_of_effect(variable_name, response, measurement_interval)}}{Returns the time in minues a variable is estimated to have an effect on another variable.
+\item{\code{determine_effect_network(include_autoregressive_effects = FALSE)}}{Returns the summed effect each node has on the other nodes node
+@param include_autoregressive_effects if enabled, autoregressive effects are used (default FALSE). Not yet supported!}
+
+\item{\code{determine_length_of_effect(variable_name, response, measurement_interval,
+  first_effect_only = FALSE)}}{Returns the time in minues a variable is estimated to have an effect on another variable.
 @param variable_to_shock the name of the variable to receive the shock
 @param variable_to_respond the name of the variable to respond to the shock
 @param measurement interval the time in minutes between two measurements}

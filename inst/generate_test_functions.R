@@ -1,7 +1,6 @@
-context('aira')
-
+base_dir <- 'tests/testthat/'
 testdata_var_model_pp1 <- function() {
-  data_set <- autovar::read_spss("inst/pp1_nieuw_compleet.sav", to.data.frame=TRUE)
+  data_set <- autovar::read_spss(paste(base_dir, "inst/pp1_nieuw_compleet.sav", sep=""), to.data.frame=TRUE)
   endodata <- data_set[,c('SomBewegUur', 'SomPHQ')]
   exogedata <- data_set[,c('UitbijterPHQ','UitbijterBeweg')]
   #assign("endodata", "endodata", envir = .GlobalEnv)
@@ -20,10 +19,9 @@ testdata_var_model_pp1 <- function() {
 
 
 testdata_var_model_pp2 <- function() {
-  data_set <- autovar::read_spss("inst/pp2_nieuw_compleet_64dagen.sav", to.data.frame=TRUE)
-
+  data_set <- autovar::read_spss(paste(base_dir, "inst/pp2_nieuw_compleet_64dagen.sav", sep=""), to.data.frame=TRUE)
   endodata <- data_set[,c('lnSomBewegUur', 'lnSomPHQ')]
-  exogedata <- data_set[,c('UitbijterBeweg')]
+  exogedata <- data_set[,c('UitbijterBeweg'), drop=FALSE]
   #assign("endodata", "endodata", envir = .GlobalEnv)
 
   var.2c <- vars::VAR(endodata, p=1, type='const', exogen=exogedata)
@@ -39,7 +37,7 @@ testdata_var_model_pp2 <- function() {
 }
 
 testdata_var_model_pp4 <- function() {
-  data_set <- autovar::read_spss("inst/pp4_nieuw_compleet_met_140min.sav", to.data.frame=TRUE)
+  data_set <- autovar::read_spss(paste(base_dir, "inst/pp4_nieuw_compleet_met_140min.sav", sep=""), to.data.frame=TRUE)
   endodata <- data_set[,c('SomPHQ', 'SomBewegUur')]
   exogedata <- data_set[,c('Work', 'UitbijterPHQ', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')]
   #assign("endodata", "endodata", envir = .GlobalEnv)
@@ -72,9 +70,9 @@ testdata_var_model_pp4 <- function() {
 }
 
 testdata_var_model_pp5 <- function() {
-  data_set <- autovar::read_spss("inst/pp5_nieuw_compleet.sav", to.data.frame=TRUE)
+  data_set <- autovar::read_spss(paste(base_dir, "inst/pp5_nieuw_compleet.sav", sep=""), to.data.frame=TRUE)
   endodata <- data_set[,c('lnSomBewegUur', 'lnSomPHQ')]
-  exogedata <- data_set[,c('Uitbijter_27')]
+  exogedata <- data_set[,c('Uitbijter_27'), drop=FALSE]
 
   var.2c <- vars::VAR(endodata, p=1, type='const', exogen=exogedata)
   resmat <- autovar::new_restriction_matrix(var.2c)
@@ -87,9 +85,3 @@ testdata_var_model_pp5 <- function() {
   var.2c$exogen <- exogedata
   var.2c
 }
-
-# Check if any of the models give errors
-testdata_var_model_pp1()
-testdata_var_model_pp2()
-testdata_var_model_pp4()
-testdata_var_model_pp5()
