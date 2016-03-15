@@ -85,7 +85,7 @@ Aira <- setRefClass('Aira',
           total[[variable_name]] <- Inf
           next
         }
-        needed_difference <- mean(var_model$y[,variable_to_improve]) * (percentage / 100)
+        needed_difference <- mean(var_model$y[,variable_to_improve]) * horizon * (percentage / 100) * sd(var_model$y[,variable_name])
         needed_difference <- needed_difference / effect
         needed_difference <- needed_difference / mean(var_model$y[,variable_name])
 
@@ -94,7 +94,7 @@ Aira <- setRefClass('Aira',
       total
     },
 
-    determine_length_of_effect = function(variable_name, response, measurement_interval, first_effect_only=FALSE) {
+    determine_length_of_effect = function(variable_name, response, measurement_interval, first_effect_only=FALSE, plot_results=FALSE) {
       "Returns the time in minues a variable is estimated to have an effect on another variable.
       @param variable_to_shock the name of the variable to receive the shock
       @param variable_to_respond the name of the variable to respond to the shock
@@ -102,6 +102,7 @@ Aira <- setRefClass('Aira',
 
       if(bootstrap_iterations <= 0) stop('Bootstrapping is needed for this function.')
       result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
+      if(plot_results) plot(result)
 
       lower <- result$Lower[[variable_name]]
       upper <- result$Upper[[variable_name]]
@@ -118,24 +119,28 @@ Aira <- setRefClass('Aira',
           # If the beginning of the effect is not on the first measurement, we should interpolate.
           if (i > 1 & !effect_started) {
             if (low[i]){
-              begin = i - ((lower[i] - 0) / (lower[i] - lower[i-1]))
+              begin = i - ((lower[i] - 0) / (lower[i] - lower[i - 1]))
             } else { # high[i] == true
-              begin = i - ((upper[i] - 0) / (upper[i] - upper[i-1]))
+              begin = i - ((upper[i] - 0) / (upper[i] - upper[i - 1]))
             }
           }
           effect_started = TRUE
         } else {
           if (effect_started) {
             if (low[i-1]){
-              end = i + ((lower[i] - 0) / (lower[i] - lower[i-1]))
+              end = i + (1 - ((lower[i] - 0) / (lower[i] - lower[i - 1])))
             } else { # high[i-1] == true
-              end = i + ((upper[i] - 0) / (upper[i] - upper[i-1]))
+              end = i + (1 - ((upper[i] - 0) / (upper[i] - upper[i - 1])))
             }
             effect_started = FALSE
-            total_length <- total_length + (end - begin)
+            total_length <- total_length + ((end - 1) - begin)
             if(first_effect_only) break
           }
         }
+      }
+      # The effect has never stopped?
+      if(effect_started) {
+        total_length <- total_length + ((horizon - 1) - begin)
       }
       total_length * measurement_interval
     },

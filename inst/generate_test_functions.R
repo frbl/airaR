@@ -12,11 +12,11 @@ testdata_var_model_pp1 <- function() {
   resmat <- autovar::update_restriction_matrix(var.2c, 'SomPHQ', 'SomBewegUur.l2', 0, resmat)
   resmat <- autovar::update_restriction_matrix(var.2c, 'SomBewegUur', 'UitbijterPHQ', 0, resmat)
   resmat <- autovar::format_restriction_matrix(var.2c, resmat)
+
   var.2c <- vars::restrict(var.2c, method = 'manual', resmat = resmat)
   var.2c$exogen <- exogedata
   var.2c
 }
-
 
 testdata_var_model_pp2 <- function() {
   data_set <- autovar::read_spss(paste(base_dir, "inst/pp2_nieuw_compleet_64dagen.sav", sep=""), to.data.frame=TRUE)

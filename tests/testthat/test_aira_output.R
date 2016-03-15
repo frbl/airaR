@@ -26,10 +26,28 @@ test_that('print_overview_percentage_effect', {
 
 test_that('print_percentage_effect', {
   aira_output <- AiraOutput$new(aira = testdata_aira_model())
-  result <- aira_output$print_percentage_effect('SomBewegUur', 20)
-  expected = "Effect achieved:\n"
-  expected = paste(expected, "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 72%\n", sep ="")
-  expect_equal(result, expected)
+  test_that('Can print with newlines', {
+    result <- aira_output$print_percentage_effect('SomBewegUur', 20, print_newlines = TRUE, print_title = TRUE)
+    expected = "Effect achieved:\n"
+    expected = paste(expected, "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 72%\n", sep ="")
+    expect_equal(result, expected)
+  })
+  test_that('Can print without newlines', {
+    result <- aira_output$print_percentage_effect('SomBewegUur', 20, print_newlines = FALSE, print_title = FALSE)
+    expected = "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 72%."
+    expect_equal(result, expected)
+  })
+  test_that('Can print with title', {
+    result <- aira_output$print_percentage_effect('SomBewegUur', 20, print_newlines = FALSE, print_title = TRUE)
+    expected = "Effect achieved: "
+    expected = paste(expected, "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 72%.", sep ="")
+    expect_equal(result, expected)
+  })
+  test_that('Can print without title', {
+    result <- aira_output$print_percentage_effect('SomBewegUur', 20, print_newlines = TRUE, print_title = FALSE)
+    expected = "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 72%\n"
+    expect_equal(result, expected)
+  })
 })
 
 test_that('export_model', {
@@ -79,9 +97,27 @@ test_that('export_model', {
     expect_equal(result, expected, tolerance=1e-5)
   })
   test_that('Canada', {
+    coef(testdata_multiple_variables()$var_model)
     aira_output <- AiraOutput$new(aira = testdata_multiple_variables())
     result <- aira_output$export_model()
-    print(result)
+    expect_equal(names(result),c('links', 'nodes'))
+
+    # The values below have been copied, just testing if everything is in the export function.
+    links <- data.frame(source = c(1,3,0),
+                        target = c(0,1,3),
+                        distance = rep(0.9,3),
+                        weight = c(0.1716493, 0.8906147, -0.5761010), stringsAsFactors = FALSE)
+
+    nodes <- data.frame(index = seq(0,3),
+                        name = c('e', 'prod', 'rw', 'U'),
+                        key = c('e', 'prod', 'rw', 'U'),
+                        val = c(-1.6746779, -0.9059553, -2.1666230, 3.4960103), stringsAsFactors = FALSE)
+
+    # The strings are too precise
+    result$links$weight <- as.numeric(result$links$weight)
+
+    expect_equal(result$links, links, tolerance= 1e-7)
+    expect_equal(result$nodes, nodes, tolerance= 1e-7)
   })
 })
 
