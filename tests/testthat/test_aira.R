@@ -152,7 +152,7 @@ test_that('determine_percentage_effect', {
     expect_equal(tot$SomPHQ, NULL)
 
     # The effect of SomBewegUur on SomPhq is not null, so this can have an effect
-    expect_equal(tot$SomBewegUur, -.0705, tolerance=1e-4)
+    expect_equal(tot$SomBewegUur, -1.604586, tolerance=1e-4)
   })
 
   test_that('without orthogonalization', {
@@ -167,8 +167,8 @@ test_that('determine_percentage_effect', {
 
     # The effect on the variable itself should not be included
     expect_equal(result$SomPHQ, NULL)
-    # Result checked with website
-    expect_equal(result$SomBewegUur, -0.1562397, tolerance=1e-5)
+    expected <- -3.555889
+    expect_equal(result$SomBewegUur, expected, tolerance=1e-5)
   })
 
   test_that('with a higher percentage', {
@@ -184,8 +184,7 @@ test_that('determine_percentage_effect', {
 
     # The effect on the variable itself should not be included
     expect_equal(result$SomPHQ, NULL)
-    # Result checked with website
-    expected = -0.1562397*2
+    expected = -7.111777
     expect_equal(result$SomBewegUur, expected, tolerance=1e-5)
   })
 })
