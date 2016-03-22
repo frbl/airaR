@@ -163,6 +163,9 @@ Aira <- setRefClass('Aira',
       # If we have processed this call before, return it from the cache
       if((key %in% names(irf_cache)) & !plot_results) return(irf_cache[[key]])
       if (bootstrap_iterations > 0) {
+        ## TERRIBLE;
+        set_exo(var_model)
+
         result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
         low <- (result$Lower[[variable_name]] * (result$Lower[[variable_name]] > 0))
         high <- (result$Upper[[variable_name]] * (result$Upper[[variable_name]] < 0))
