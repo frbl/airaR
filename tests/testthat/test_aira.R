@@ -117,6 +117,17 @@ test_that('determine_best_node_from_all', {
       expect_true(class(tot$rw) == 'numeric')
     })
   })
+  test_that('It takes the negative variables into account', {
+    .set_exo(testdata_var_model())
+    negative_variables <- c('SomPHQ')
+
+    aira <- Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = testdata_var_model(), orthogonalize= FALSE)
+    tot <- aira$determine_best_node_from_all(negative_variables = negative_variables)
+
+    # Result from aira-web
+    expect_equal(tot$SomBewegUur, 1.047593888, tolerance=1e-5)
+    expect_equal(tot$SomPHQ, 0, tolerance=1e-5)
+  })
 })
 
 test_that('determine_effect_network', {

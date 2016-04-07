@@ -17,6 +17,8 @@ Suggests:
     testthat,
     roxygen2,
     autovar,
+    autovarCore,
+    amelia,
     ggplot2,
     grid
 Imports:

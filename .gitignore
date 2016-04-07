@@ -20,3 +20,4 @@ vignettes/*.pdf
 .Rproj.user
 
 .DS_Store
+tests/testthat/inst/csv/*
