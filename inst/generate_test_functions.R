@@ -85,3 +85,55 @@ testdata_var_model_pp5 <- function() {
   var.2c$exogen <- exogedata
   var.2c
 }
+
+
+csv100849 <- function(){
+  if(!exists("file_100849")) {
+    file_100849 <<- read.csv(paste(base_dir, "inst/csv/100849.csv", sep=""), stringsAsFactors = FALSE)
+    removed_columns <- c('date', 'X', 'pa', 'na')
+
+    # Remove unused columns
+    file_100849 <<- file[,!(names(file) %in% removed_columns)]
+    file_100849 <<- autovar::impute_dataframe(file, measurements_per_day = 3, repetitions = 150)
+  }
+  file_100849
+}
+
+
+testdata_var_model_100849 <- function(bust_cache=FALSE) {
+  if(!exists("var_100849") || bust_cache) {
+    file <- csv100849()
+
+    var_100849 <<- autovarCore::autovar(
+      file,
+      selected_column_names = names(file),
+      measurements_per_day = 3,
+      criterion='BIC',
+      test_names = c("portmanteau", "portmanteau_squared","skewness"),
+      imputation_iterations = 150
+    )
+  }
+  var.2c <- var_100849[[1]]$varest
+  var.2c
+}
+
+testdata_var_model_100849_2 <- function(bust_cache=FALSE) {
+  if(!exists("var_100849_2") || bust_cache) {
+    file <- csv100849()
+
+    # Invert NA:
+    file$na_activation <- 100 - file$na_activation
+    file$pa_activation <- 100 - file$pa_activation
+
+    var_100849_2 <<- autovarCore::autovar(
+      file,
+      selected_column_names = names(file),
+      measurements_per_day = 3,
+      criterion='BIC',
+      test_names = c("portmanteau", "portmanteau_squared","skewness"),
+      imputation_iterations = 1
+    )
+  }
+  var.2c <- var_100849_2[[1]]$varest
+  var.2c
+}

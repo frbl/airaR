@@ -24,7 +24,9 @@ set_exo <- function(model) {
   pattern <- paste('const', pattern, sep='|')
   endogen <- grepl(pattern, names(model$datamat), perl=TRUE)
   exogedata <<- model$datamat[names(model$datamat)[!endogen]]
+  exo_matrix <<- model$datamat[names(model$datamat)[!endogen]]
   for ( i in 1:model$p) {
     exogedata <<- rbind(rep(0, length(!endogen)), exogedata)
+    exo_matrix <<- rbind(rep(0, length(!endogen)), exo_matrix)
   }
 }
