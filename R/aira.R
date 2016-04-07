@@ -31,10 +31,12 @@ Aira <- setRefClass('Aira',
                 var_model = var_model, orthogonalize = orthogonalize, name = name)
     },
 
-    determine_best_node_from_all = function() {
+    determine_best_node_from_all = function(negative_variables = c()) {
       "Returns the total effect a variable has on all other variables in the network.
       If bootstrap iterations provided to aira is 0, we will not run any bootstrapping.
-      If bootstrap iterations >0, we will only consider the significant effects in the response"
+      If bootstrap iterations >0, we will only consider the significant effects in the response. If negative_variables
+      are provided, we will convert those variables to positive ones (i.e., depression will become -1 * depression)
+      @param negative_variables the variables to invert to positibe variables"
       total <- list()
       for (variable in 1:var_model$K) {
         variable_name <- .get_variable_name(variable)
@@ -42,7 +44,11 @@ Aira <- setRefClass('Aira',
         for (response_name in 1:var_model$K) {
           if (variable == response_name) next
           response_name <- .get_variable_name(response_name)
-          irf <- .calculate_irf(variable_name=variable_name, response=response_name)
+
+          # If the current response variable is a negative variable, we'd like to invert the result
+          multiplier <- ifelse(response_name %in% negative_variables, -1, 1)
+
+          irf <- multiplier * .calculate_irf(variable_name=variable_name, response=response_name)
           total[[variable_name]] <- total[[variable_name]] + irf
         }
       }
@@ -167,7 +173,7 @@ Aira <- setRefClass('Aira',
         set_exo(var_model)
 
         result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
-        low <- (result$Lower[[variable_name]] * (result$Lower[[variable_name]] > 0))
+        low  <- (result$Lower[[variable_name]] * (result$Lower[[variable_name]] > 0))
         high <- (result$Upper[[variable_name]] * (result$Upper[[variable_name]] < 0))
         sign_effects <- (low + high)[, !dimnames(result$Lower[[variable_name]])[[2]] %in% variable_name]
         resulting_score <- sum(sign_effects)
