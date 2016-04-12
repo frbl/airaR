@@ -21,3 +21,4 @@ vignettes/*.pdf
 
 .DS_Store
 tests/testthat/inst/csv/*
+tests/testthat/inst/csv_fionneke/*
