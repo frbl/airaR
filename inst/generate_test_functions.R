@@ -1,4 +1,5 @@
 base_dir <- 'tests/testthat/'
+library('Amelia')
 testdata_var_model_pp1 <- function() {
   data_set <- autovar::read_spss(paste(base_dir, "inst/pp1_nieuw_compleet.sav", sep=""), to.data.frame=TRUE)
   endodata <- data_set[,c('SomBewegUur', 'SomPHQ')]
@@ -87,53 +88,88 @@ testdata_var_model_pp5 <- function() {
 }
 
 
-csv100849 <- function(){
-  if(!exists("file_100849")) {
-    file_100849 <<- read.csv(paste(base_dir, "inst/csv/100849.csv", sep=""), stringsAsFactors = FALSE)
-    removed_columns <- c('date', 'X', 'pa', 'na')
+###############################################
+#               HGI TEST FUNCTIONS            #
+###############################################
+loadData <- function(file) {
+  data <- read.csv(paste(base_dir, "inst/csv/",file,".csv", sep=""), stringsAsFactors = FALSE)
+  included_columns <- c('somberheid', 'activity', 'eigenwaarde')
 
-    # Remove unused columns
-    file_100849 <<- file[,!(names(file) %in% removed_columns)]
-    file_100849 <<- autovar::impute_dataframe(file, measurements_per_day = 3, repetitions = 150)
-  }
-  file_100849
+  # Remove unused columns
+  data <- data[,(names(data) %in% included_columns)]
+  autovar::impute_dataframe(data, measurements_per_day = 3, repetitions = 150)
+}
+
+calculateVar <- function(data) {
+  models <- autovarCore::autovar(
+    data,
+    selected_column_names = names(data),
+    measurements_per_day = 3,
+    criterion='BIC',
+    test_names = c("portmanteau", "portmanteau_squared","skewness"),
+    imputation_iterations = 1
+  )
+  if (models[[1]]$bucket < 0.01 ) print('Model not very valid')
+  models
 }
 
 
+testdata_var_model_100551 <- function(bust_cache=FALSE) {
+  if(!exists("var_100551") || bust_cache) {
+    if(!exists("file_100551") || bust_cache) {
+      file_100551 <<- loadData('100551')
+    }
+    file <- file_100551
+    var_100551 <<- calculateVar(file)
+  }
+  var.2c <- var_100551[[1]]$varest
+  var.2c
+}
+
 testdata_var_model_100849 <- function(bust_cache=FALSE) {
   if(!exists("var_100849") || bust_cache) {
-    file <- csv100849()
-
-    var_100849 <<- autovarCore::autovar(
-      file,
-      selected_column_names = names(file),
-      measurements_per_day = 3,
-      criterion='BIC',
-      test_names = c("portmanteau", "portmanteau_squared","skewness"),
-      imputation_iterations = 150
-    )
+    if(!exists("file_100849") || bust_cache) {
+      file_100849 <<- loadData('100849')
+    }
+    file <- file_100849
+    var_100849 <<- calculateVar(file)
   }
   var.2c <- var_100849[[1]]$varest
   var.2c
 }
 
-testdata_var_model_100849_2 <- function(bust_cache=FALSE) {
-  if(!exists("var_100849_2") || bust_cache) {
-    file <- csv100849()
-
-    # Invert NA:
-    file$na_activation <- 100 - file$na_activation
-    file$pa_activation <- 100 - file$pa_activation
-
-    var_100849_2 <<- autovarCore::autovar(
-      file,
-      selected_column_names = names(file),
-      measurements_per_day = 3,
-      criterion='BIC',
-      test_names = c("portmanteau", "portmanteau_squared","skewness"),
-      imputation_iterations = 1
-    )
+testdata_var_model_112098 <- function(bust_cache=FALSE) {
+  if(!exists("var_112098") || bust_cache) {
+    if(!exists("file_112098") || bust_cache) {
+      file_112098 <<- loadData('112098')
+    }
+    file <- file_112098
+    var_112098 <<- calculateVar(file)
   }
-  var.2c <- var_100849_2[[1]]$varest
+  var.2c <- var_112098[[1]]$varest
+  var.2c
+}
+
+testdata_var_model_110478 <- function(bust_cache=FALSE) {
+  if(!exists("var_110478") || bust_cache) {
+    if(!exists("file_110478") || bust_cache) {
+      file_110478 <<- loadData('110478')
+    }
+    file <- file_110478
+    var_110478 <<- calculateVar(file)
+  }
+  var.2c <- var_110478[[1]]$varest
+  var.2c
+}
+
+testdata_var_model_100713 <- function(bust_cache=FALSE) {
+  if(!exists("var_100713") || bust_cache) {
+    if(!exists("file_100713") || bust_cache) {
+      file_100713 <<- loadData('100713')
+    }
+    file <- file_100713
+    var_100713 <<- calculateVar(file)
+  }
+  var.2c <- var_100713[[1]]$varest
   var.2c
 }

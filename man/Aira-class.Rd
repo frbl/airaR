@@ -22,9 +22,11 @@ The aira main class.
 \section{Methods}{
 
 \describe{
-\item{\code{determine_best_node_from_all()}}{Returns the total effect a variable has on all other variables in the network.
+\item{\code{determine_best_node_from_all(negative_variables = c())}}{Returns the total effect a variable has on all other variables in the network.
 If bootstrap iterations provided to aira is 0, we will not run any bootstrapping.
-If bootstrap iterations >0, we will only consider the significant effects in the response}
+If bootstrap iterations >0, we will only consider the significant effects in the response. If negative_variables
+are provided, we will convert those variables to positive ones (i.e., depression will become -1 * depression)
+@param negative_variables the variables to invert to positibe variables}
 
 \item{\code{determine_effect_network(include_autoregressive_effects = FALSE)}}{Returns the summed effect each node has on the other nodes node
 @param include_autoregressive_effects if enabled, autoregressive effects are used (default FALSE). Not yet supported!}
