@@ -2,17 +2,60 @@ library('aira')
 library('xtable')
 source('inst/generate_test_functions.R')
 
-var_model_100849 <- function() {
-  name = '100849'
-  model <- testdata_var_model_100849()
-  aira <- Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = model,
-                   orthogonalize= TRUE, reverse_order=FALSE) # Reverse order is order 2
+test_model <- function(model) {
+  aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = model,
+                   orthogonalize= FALSE, reverse_order=FALSE) # Reverse order is order 2
   set_exo(model)
-  lag <<- model$p
-  negative_variables <- c('na_deactivation', 'na_activation', 'stress')
+  negative_variables <- c('somberheid')
   aira$determine_best_node_from_all(negative_variables = negative_variables)
 }
 
+bust <- FALSE
 # Check if any of the models give errors
-p100849 <-var_model_100849()
+model <- testdata_var_model_100849(bust)
+lag <- model$p
+p100849 <- test_model(model)
+
+model <- testdata_var_model_100551(bust)
+lag <- model$p
+p100551 <- test_model(model)
+
+model <- testdata_var_model_112098(bust)
+lag <- model$p
+p112098 <- test_model(model)
+
+model <- testdata_var_model_110478(bust)
+lag <- model$p
+p110478 <- test_model(model)
+
+model <- testdata_var_model_100713(bust)
+lag <- model$p
+p100713 <- test_model(model)
+
 print(p100849)
+print(p100551)
+print(p112098)
+print(p110478)
+print(p100713)
+
+x <- rbind(
+  t(p100849),
+  t(p100551),
+  t(p112098),
+  t(p110478),
+  t(p100713)
+)
+
+rownames(x)<- paste('Person',1:dim(x)[1])
+data.frame(x)
+colnames(x) <- c("Activity", "Feeling down", "Self worth")
+
+table <- xtable(x, label="tab:effects_in_aira",
+                caption='Effects of Activity and Feeling down', digits = 3)
+print(table,
+      file='inst/output/tab_effects_in_aira.tex',
+      sanitize.text.function=function(str)gsub(" "," ",str,fixed=TRUE),
+      floating=TRUE,
+      booktabs=TRUE, floating.environment = 'table')
+
+print(x)
