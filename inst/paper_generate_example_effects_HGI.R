@@ -2,7 +2,8 @@ library('aira')
 library('xtable')
 source('inst/generate_test_functions.R')
 
-test_model <- function(model) {
+test_model <- function(model, negative_variables) {
+  model <- convert_var_to_positive(var_model = model, negative_variables = negative_variables)
   aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = model,
                    orthogonalize= FALSE, reverse_order=FALSE) # Reverse order is order 2
   set_exo(model)
@@ -10,27 +11,28 @@ test_model <- function(model) {
   aira$determine_best_node_from_all(negative_variables = negative_variables)
 }
 
+negative_variables <- c('Feeling down')
 bust <- FALSE
 # Check if any of the models give errors
 model <- testdata_var_model_100849(bust)
 lag <- model$p
-p100849 <- test_model(model)
+p100849 <- test_model(model, negative_variables)
 
 model <- testdata_var_model_100551(bust)
 lag <- model$p
-p100551 <- test_model(model)
+p100551 <- test_model(model, negative_variables)
 
 model <- testdata_var_model_112098(bust)
 lag <- model$p
-p112098 <- test_model(model)
+p112098 <- test_model(model, negative_variables)
 
 model <- testdata_var_model_110478(bust)
 lag <- model$p
-p110478 <- test_model(model)
+p110478 <- test_model(model, negative_variables)
 
 model <- testdata_var_model_100713(bust)
 lag <- model$p
-p100713 <- test_model(model)
+p100713 <- test_model(model, negative_variables)
 
 print(p100849)
 print(p100551)
@@ -46,9 +48,9 @@ x <- rbind(
   t(p100713)
 )
 
+colnames(x) <- c("Activity", "Feeling down", "Self worth")
 rownames(x)<- paste('Person',1:dim(x)[1])
 data.frame(x)
-colnames(x) <- c("Activity", "Feeling down", "Self worth")
 
 table <- xtable(x, label="tab:effects_in_aira",
                 caption='Effects of Activity and Feeling down', digits = 3)
