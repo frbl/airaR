@@ -16,9 +16,9 @@ Depends:
 Suggests:
     testthat,
     roxygen2,
+    Amelia,
     autovar,
     autovarCore,
-    amelia,
     ggplot2,
     grid
 Imports:
