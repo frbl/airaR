@@ -75,7 +75,7 @@ Aira <- setRefClass('Aira',
       effect_matrix
     },
 
-    determine_percentage_effect  = function(variable_to_improve, percentage) {
+    determine_percentage_effect = function(variable_to_improve, percentage) {
       "Returns the percentage for each variable in the network (other then the provided variable)
       to be changed in order to change the variable_to_improve with the given percentage.
       @param variable_to_improve the name of the variable in the network which we'd like to improve
