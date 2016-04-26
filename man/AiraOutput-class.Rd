@@ -16,7 +16,7 @@ The aira output class.
 \section{Methods}{
 
 \describe{
-\item{\code{export_model()}}{Exports the effects of all variables in the network}
+\item{\code{export_model(negative_variables = c())}}{Exports the effects of all variables in the network}
 
 \item{\code{export_model_to_json()}}{Exports the effects of all variables in the network in a JSON structure, that can be interpreted by the AIRA JS library}
 
