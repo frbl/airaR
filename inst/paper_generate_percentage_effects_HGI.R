@@ -48,18 +48,18 @@ print(p100713)
 
 
 decrease_onrust <- data.frame(
-  'Activity.OB.downarrow.onrust.CB.' = c(p100849$improve_onrust.beweging, p100551$improve_onrust.beweging, p112098$improve_onrust.beweging, p110478$improve_onrust.beweging, p100713$improve_onrust.beweging),
-  'Relaxation.OB.downarrow.onrust.CB.' = c(p100849$improve_onrust.ontspanning, p100551$improve_onrust.ontspanning, p112098$improve_onrust.ontspanning, p110478$improve_onrust.ontspanning, p100713$improve_onrust.ontspanning)
+  'decrease.feeling.nervous.by.changing.activity' = c(p100849$improve_onrust.beweging, p100551$improve_onrust.beweging, p112098$improve_onrust.beweging, p110478$improve_onrust.beweging, p100713$improve_onrust.beweging),
+  'decrease.feeling.nervous.by.changing.relaxation' = c(p100849$improve_onrust.ontspanning, p100551$improve_onrust.ontspanning, p112098$improve_onrust.ontspanning, p110478$improve_onrust.ontspanning, p100713$improve_onrust.ontspanning)
   )
 
 increase_activity <- data.frame(
-  'Onrust.OB.uparrow.activity.CB.' = c(p100849$improve_activity.onrust, p100551$improve_activity.onrust, p112098$improve_activity.onrust, p110478$improve_activity.onrust, p100713$improve_activity.onrust),
-  'Relaxation.OB.uparrow.activity.CB.' = c(p100849$improve_activity.ontspanning, p100551$improve_activity.ontspanning, p112098$improve_activity.ontspanning, p110478$improve_activity.ontspanning, p100713$improve_activity.ontspanning)
+  'increase.activity.by.changing.feeling.nervous' = c(p100849$improve_activity.onrust, p100551$improve_activity.onrust, p112098$improve_activity.onrust, p110478$improve_activity.onrust, p100713$improve_activity.onrust),
+  'increase.activity.by.changing.relaxation' = c(p100849$improve_activity.ontspanning, p100551$improve_activity.ontspanning, p112098$improve_activity.ontspanning, p110478$improve_activity.ontspanning, p100713$improve_activity.ontspanning)
 )
 
 increase_relaxation <- data.frame(
-  'Onrust.OB.uparrow.relaxation.CB.' = c(p100849$improve_ontspanning.onrust, p100551$improve_ontspanning.onrust, p112098$improve_ontspanning.onrust, p110478$improve_ontspanning.onrust, p100713$improve_ontspanning.onrust),
-  'Activity.OB.uparrow.relaxation.CB.' = c(p100849$improve_ontspanning.beweging, p100551$improve_ontspanning.beweging, p112098$improve_ontspanning.beweging, p110478$improve_ontspanning.beweging, p100713$improve_ontspanning.beweging)
+  'increase.relaxation.by.changing.feeling.nervous.' = c(p100849$improve_ontspanning.onrust, p100551$improve_ontspanning.onrust, p112098$improve_ontspanning.onrust, p110478$improve_ontspanning.onrust, p100713$improve_ontspanning.onrust),
+  'increase.activity.by.changing.activity' = c(p100849$improve_ontspanning.beweging, p100551$improve_ontspanning.beweging, p112098$improve_ontspanning.beweging, p110478$improve_ontspanning.beweging, p100713$improve_ontspanning.beweging)
 )
 
 x <- rbind(
@@ -69,9 +69,6 @@ x <- rbind(
 )
 x <- t(x)
 
-x[x != Inf] <- paste(round(x[x != Inf],2), '\\%', sep='')
-x[x == Inf] <- '$\\infty$'
-x
 rownames(x)<- paste('Person',1:dim(x)[1])
 column_names <- dimnames(x)[[2]]
 column_names <- gsub('.OB.', ' (', column_names)
@@ -83,10 +80,20 @@ column_names
 colnames(x) <- column_names
 #
 
+for(person in dimnames(x)[[1]]) {
+  for(change_variable in dimnames(x)[[2]]) {
+    value <- x[person,change_variable]
+    if (value != Inf)
+      print(paste(person,'can',change_variable,'with',value))
+  }
+}
+
+x[x != Inf] <- paste(round(x[x != Inf],2), '\\%', sep='')
+x[x == Inf] <- '$\\infty$'
 
 #
-table <- xtable(x, label="tab:effects_in_aira",
-                 caption='Effects of Feeling less down, relaxation and activity on well-being', digits = 3)
+table <- xtable(x, label="tab:percentage_effects_in_aira",
+                 caption='Effects of Feeling less nervous, relaxation and activity on well-being', digits = 3)
 print(table,
        file='inst/output/tab_percentage_effects_in_aira.tex',
        sanitize.text.function=function(str)gsub(" "," ",str,fixed=TRUE),
