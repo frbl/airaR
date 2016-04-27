@@ -91,7 +91,11 @@ Aira <- setRefClass('Aira',
           total[[variable_name]] <- Inf
           next
         }
-        needed_difference <- mean(var_model$y[,variable_to_improve]) * (percentage / 100) * sd(var_model$y[,variable_name])
+
+        length_of_effect <- determine_length_of_effect(variable_name, variable_to_improve, 1, first_effect_only=FALSE, plot_results=FALSE)
+        length_of_effect <- ceiling(length_of_effect)
+
+        needed_difference <- mean(var_model$y[,variable_to_improve]) * length_of_effect * (percentage / 100) * sd(var_model$y[,variable_name])
         print(paste('Needed difference:', needed_difference, ', effect: ', effect, ' SD of var to use:',  sd(var_model$y[,variable_name])))
 
 
@@ -109,14 +113,14 @@ Aira <- setRefClass('Aira',
 
     determine_length_of_effect = function(variable_name, response, measurement_interval, first_effect_only=FALSE, plot_results=FALSE) {
       "Returns the time in minues a variable is estimated to have an effect on another variable.
-      @param variable_to_shock the name of the variable to receive the shock
-      @param variable_to_respond the name of the variable to respond to the shock
+      @param variable_name the name of the variable to receive the shock
+      @param response the name of the variable to respond to the shock
       @param measurement interval the time in minutes between two measurements"
 
       if(bootstrap_iterations <= 0) stop('Bootstrapping is needed for this function.')
       result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
-      if(plot_results) plot(result)
 
+      if(plot_results) plot(result)
       lower <- result$Lower[[variable_name]]
       upper <- result$Upper[[variable_name]]
 
