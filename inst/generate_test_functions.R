@@ -93,7 +93,7 @@ testdata_var_model_pp5 <- function() {
 ###############################################
 loadData <- function(file) {
   data <- read.csv(paste(base_dir, "inst/csv/",file,".csv", sep=""), stringsAsFactors = FALSE)
-  included_columns <- c('somberheid', 'activity', 'eigenwaarde')
+  included_columns <- c('onrust', 'ontspanning', 'beweging')
 
   # Remove unused columns
   data <- data[,(names(data) %in% included_columns)]

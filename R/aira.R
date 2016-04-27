@@ -91,11 +91,18 @@ Aira <- setRefClass('Aira',
           total[[variable_name]] <- Inf
           next
         }
-        needed_difference <- mean(var_model$y[,variable_to_improve]) * horizon * (percentage / 100) * sd(var_model$y[,variable_name])
-        needed_difference <- needed_difference / effect
-        needed_difference <- needed_difference / mean(var_model$y[,variable_name])
+        needed_difference <- mean(var_model$y[,variable_to_improve]) * (percentage / 100) * sd(var_model$y[,variable_name])
+        print(paste('Needed difference:', needed_difference, ', effect: ', effect, ' SD of var to use:',  sd(var_model$y[,variable_name])))
 
-        total[[variable_name]] <- needed_difference
+
+        denominator <- mean(var_model$y[,variable_name]) * effect * sd(var_model$y[,variable_to_improve])
+
+        print(paste('Numerator', needed_difference))
+        print(paste('Denominator', denominator))
+
+        needed_difference <- needed_difference / denominator
+
+        total[[variable_name]] <- needed_difference * 100
       }
       total
     },
