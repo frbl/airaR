@@ -93,7 +93,7 @@ Aira <- setRefClass('Aira',
         }
 
         length_of_effect <- determine_length_of_effect(variable_name, variable_to_improve, 1, first_effect_only=FALSE, plot_results=FALSE)
-        length_of_effect <- ceiling(length_of_effect)
+        length_of_effect <- ceiling(length_of_effect$effective_horizon)
 
         needed_difference <- mean(var_model$y[,variable_to_improve]) * length_of_effect * (percentage / 100) * sd(var_model$y[,variable_name])
         print(paste('Needed difference:', needed_difference, ', effect: ', effect, ' SD of var to use:',  sd(var_model$y[,variable_name])))
@@ -117,49 +117,64 @@ Aira <- setRefClass('Aira',
       @param response the name of the variable to respond to the shock
       @param measurement interval the time in minutes between two measurements"
 
-      if(bootstrap_iterations <= 0) stop('Bootstrapping is needed for this function.')
-      result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
+      # TODO: The effect is currently not cached.
+      if(bootstrap_iterations <= 0) {
+        result <- vars_functions$irf(from=variable_name, to=response)
+        lower <- result$irf[[variable_name]]
+        upper <- lower
+      } else {
+        result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
+        lower <- result$Lower[[variable_name]]
+        upper <- result$Upper[[variable_name]]
+      }
 
       if(plot_results) plot(result)
-      lower <- result$Lower[[variable_name]]
-      upper <- result$Upper[[variable_name]]
 
-      low <- (lower > 0)
-      high <- (upper < 0)
+      # In order to be able to support normal irf (not only bootstrapped irf) we should incorporate rounding errors. 
+      threshold <- 1e-4
+      low <- (lower > threshold)
+      high <- (upper < -threshold)
       begin <- 1
       end <- begin
       effect_started <- FALSE
-      total_length = 0
-
+      effective_horizon <- 0
+      exact_length <- 0
       for (i in 1:horizon) {
         if (low[i] | high[i]) {
           # If the beginning of the effect is not on the first measurement, we should interpolate.
           if (i > 1 & !effect_started) {
             if (low[i]){
-              begin = i - ((lower[i] - 0) / (lower[i] - lower[i - 1]))
-            } else { # high[i] == true
-              begin = i - ((upper[i] - 0) / (upper[i] - upper[i - 1]))
+              begin = i - ((lower[i] - threshold) / (lower[i] - lower[i - 1]))
+            } else if(high[i]) { # high[i] == true
+              begin = i - ((upper[i] + threshold) / (upper[i] - upper[i - 1]))
             }
           }
           effect_started = TRUE
         } else {
           if (effect_started) {
             if (low[i-1]){
-              end = i + (1 - ((lower[i] - 0) / (lower[i] - lower[i - 1])))
-            } else { # high[i-1] == true
-              end = i + (1 - ((upper[i] - 0) / (upper[i] - upper[i - 1])))
+              end = i + (1 - ((lower[i] - threshold) / (lower[i] - lower[i - 1])))
+            } else if(high[i-1]) { # high[i-1] == true
+              end = i + (1 - ((upper[i] + threshold) / (upper[i] - upper[i - 1])))
             }
-            effect_started = FALSE
-            total_length <- total_length + ((end - 1) - begin)
+            effective_horizon <- end - 1
+            effect_started <- FALSE
+            exact_length <- exact_length + ((end - 1) - begin)
             if(first_effect_only) break
           }
         }
       }
       # The effect has never stopped?
       if(effect_started) {
-        total_length <- total_length + ((horizon - 1) - begin)
+        exact_length <- exact_length + ((horizon - 1) - begin)
+        effective_horizon <- horizon
       }
-      total_length * measurement_interval
+
+      data.frame(
+        length_in_minutes = exact_length * measurement_interval,
+        length_of_effect = exact_length,
+        effective_horizon = effective_horizon
+      )
     },
     get_all_variable_names = function() {
       "returns all variables in the var model"

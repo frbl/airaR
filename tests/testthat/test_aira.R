@@ -163,7 +163,13 @@ test_that('determine_percentage_effect', {
     expect_equal(tot$SomPHQ, NULL)
 
     # The effect of SomBewegUur on SomPhq is not null, so this can have an effect
-    expect_equal(tot$SomBewegUur, -1.604586, tolerance=1e-4)
+    #TODO: Currently this is a magic number, change this once the formula is really final
+    expected <- -76.5
+    expect_equal(tot$SomBewegUur, expected, tolerance=1e-2)
+  })
+
+  test_that('should call the lenght of effect function', {
+      skip('Test not yet implemented, we need to mock the call to the determine_length_of_effect func')
   })
 
   test_that('without orthogonalization', {
@@ -178,12 +184,14 @@ test_that('determine_percentage_effect', {
 
     # The effect on the variable itself should not be included
     expect_equal(result$SomPHQ, NULL)
-    expected <- -3.555889
-    expect_equal(result$SomBewegUur, expected, tolerance=1e-5)
+
+    #TODO: Currently this is a magic number, change this once the formula is really final
+    expected <- -170.4
+    expect_equal(result$SomBewegUur, expected, tolerance=1e-2)
   })
 
   test_that('with a higher percentage', {
-    percentage = 20
+    percentage <- 20
     aira <- Aira$new(bootstrap_iterations = 0, horizon= 10, var_model = testdata_var_model(), orthogonalize= FALSE)
     result <- aira$determine_percentage_effect("SomBewegUur", percentage)
 
@@ -195,28 +203,155 @@ test_that('determine_percentage_effect', {
 
     # The effect on the variable itself should not be included
     expect_equal(result$SomPHQ, NULL)
-    expected = -7.111777
-    expect_equal(result$SomBewegUur, expected, tolerance=1e-5)
+
+    #TODO: Currently this is a magic number, change this once the formula is really final
+    expected <- -339
+    expect_equal(result$SomBewegUur, expected, tolerance=1e-3)
   })
 })
 
 ## HERE WE REPLECATE THE ROSMALEN EXPERIMENT
 test_that('determine_length_of_effect', {
-  if(fast) skip('Takes too long')
-  variable_to_shock = 'SomBewegUur'
-  variable_to_respond = 'SomPHQ'
-  aira <- Aira$new(bootstrap_iterations = 2000, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE, reverse_order=FALSE)
-  .set_exo(testdata_var_model())
-  result <- aira$determine_length_of_effect(variable_name = variable_to_shock,
-                                            response = variable_to_respond,
-                                            measurement_interval = 24*60)
+  test_that('should return a dataframe with three elements', {
+    variable_to_shock <- 'SomBewegUur'
+    variable_to_respond <- 'SomPHQ'
+    aira <- Aira$new(bootstrap_iterations = 10, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE, reverse_order=FALSE)
+    .set_exo(testdata_var_model())
+    result <- aira$determine_length_of_effect(variable_name = variable_to_shock,
+                                              response = variable_to_respond,
+                                              measurement_interval = 24*60)
+    expect_equal(length(names(result)), 3)
+    expect_equal(names(result), c( 'length_in_minutes', 'length_of_effect', 'effective_horizon'))
+  })
 
-  # We expect the effect to be between 1.5 and three days
-  expected_bottom = 1.5 * 24 * 60
-  expected_top = 3 * 24 * 60
-  print(result/(24*60))
-  expect_more_than(result, expected_bottom)
-  expect_less_than(result, expected_top)
+  test_that('should produce similar results to the rosmalen project', {
+    set.seed(9)
+    variable_to_shock <- 'SomBewegUur'
+    variable_to_respond <- 'SomPHQ'
+    aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE, reverse_order=FALSE)
+    .set_exo(testdata_var_model())
+    result <- aira$determine_length_of_effect(variable_name = variable_to_shock,
+                                              response = variable_to_respond,
+                                              measurement_interval = 24*60)
+
+    # We expect the effect to be between 1.5 and three days
+    expected <- 2.6904
+    expect_equal(result$length_in_minutes / (24*60), expected, tolerance=1e-5)
+  })
+
+  test_that('should return the correct effective horizon',{
+    test_that('should work with non-bootstrapped effects',{
+      test_that('should return the correct total effect',{
+        variable_to_shock <- 'SomBewegUur'
+        variable_to_respond <- 'SomPHQ'
+        interval <- 24*60
+        horizon <- 50
+
+        aira <- Aira$new(bootstrap_iterations = 0, horizon= horizon, var_model = testdata_var_model(), orthogonalize= FALSE , reverse_order=FALSE)
+        result <- aira$determine_length_of_effect(variable_name = variable_to_shock,
+                                                  response = variable_to_respond,
+                                                  measurement_interval = interval)
+
+        vars_functions <- VarsFunctions$new(bootstrap_iterations = 0,
+                                            horizon = horizon,
+                                            var_model = testdata_var_model(),
+                                            orthogonalize = FALSE,
+                                            reverse_order = FALSE
+                                            )
+        vars_result <- vars_functions$irf(from=variable_to_shock, to=variable_to_respond)
+        the_actual_effect <- (vars_result$irf[[variable_to_shock]] < -1e-4 | vars_result$irf[[variable_to_shock]] > 1e-4)
+
+        # Get the last TRUE element, and get its position. That would be the effective horizon length
+        the_actual_effect_rev <- rev(the_actual_effect)
+        last_index <- length(the_actual_effect)
+        for(i in 1:length(the_actual_effect)) {
+          if(the_actual_effect_rev[i]) {
+            last_index <- last_index+1 - i
+            break
+          }
+        }
+
+        diff <- result$effective_horizon - last_index
+
+        # Since we are interpolating the places where it crosses zero (or the threshold) only at the end, we could have a most a deviation of 1
+        expect_less_than(diff, 1)
+        expect_gte(diff, 0)
+      })
+      test_that('should return the correct total effect',{
+        variable_to_shock <- 'SomBewegUur'
+        variable_to_respond <- 'SomPHQ'
+        interval <- 24*60
+        horizon <- 50
+        aira <- Aira$new(bootstrap_iterations = 0, horizon= horizon, var_model = testdata_var_model(), orthogonalize= FALSE , reverse_order=FALSE)
+        result <- aira$determine_length_of_effect(variable_name = variable_to_shock,
+                                                  response = variable_to_respond,
+                                                  measurement_interval = interval)
+
+        vars_functions <- VarsFunctions$new(bootstrap_iterations = 0,
+                                            horizon = horizon,
+                                            var_model = testdata_var_model(),
+                                            orthogonalize = FALSE,
+                                            reverse_order = FALSE
+                                            )
+        vars_result <- vars_functions$irf(from=variable_to_shock, to=variable_to_respond)
+
+        the_actual_effect <- vars_result$irf[[variable_to_shock]][(vars_result$irf[[variable_to_shock]] < -1e-4 | vars_result$irf[[variable_to_shock]] > 1e-4)]
+
+        diff <- result$length_of_effect - length(the_actual_effect)
+        # Since we are interpolating the places where it crosses zero (or the threshold), we could have a most a deviation of 2
+        expect_less_than(diff, 2)
+        expect_gte(diff, 0)
+      })
+    })
+    test_that('should work with non-bootstrapped effects',{
+      test_that('should return the total horizon if the effect does not stop anywhere',{
+        set.seed(9)
+        variable_to_shock <- 'SomBewegUur'
+        variable_to_respond <- 'SomPHQ'
+        aira <- Aira$new(bootstrap_iterations = 10, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE, reverse_order=FALSE)
+        .set_exo(testdata_var_model())
+        interval <- 24*60
+        result <- aira$determine_length_of_effect(variable_name <- variable_to_shock,
+                                                  response = variable_to_respond,
+                                                  measurement_interval = interval)
+
+        # The effects were visually inspected, and it seems that the result is always < the line, hence the effect doesn't quit, and therefore the
+        # effective horizon is the total horizon
+        expect_equal(result$effective_horizon, 10)
+      })
+      test_that('should return the total horizon if the effect does stop',{
+        set.seed(5)
+        variable_to_shock <- 'SomBewegUur'
+        variable_to_respond <- 'SomPHQ'
+        aira <- Aira$new(bootstrap_iterations = 100, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE, reverse_order=FALSE)
+        .set_exo(testdata_var_model())
+        interval <- 24*60
+        result <- aira$determine_length_of_effect(variable_name = variable_to_shock,
+                                                  response = variable_to_respond,
+                                                  measurement_interval = interval)
+
+        # The effects were visually inspected, and it seems the effects become significant a bit before step 2 (1.5), and die out a bit after 2 (2.5)
+        expect_more_than(result$effective_horizon, 2)
+        expect_less_than(result$effective_horizon, 3)
+
+        # Since the beginning is not significant, the length should be less
+        expect_less_than(result$length_of_effect, result$effective_horizon)
+      })
+    })
+  })
+
+  test_that('should return the correct length of the effect',{
+    variable_to_shock <- 'SomBewegUur'
+    variable_to_respond <- 'SomPHQ'
+    aira <- Aira$new(bootstrap_iterations = 10, horizon= 10, var_model = testdata_var_model(), orthogonalize= TRUE, reverse_order=FALSE)
+    .set_exo(testdata_var_model())
+    interval <- 24*60
+    result <- aira$determine_length_of_effect(variable_name = variable_to_shock,
+                                              response = variable_to_respond,
+                                              measurement_interval = interval)
+
+    expect_equal(result$length_in_minutes / interval, result$length_of_effect, tolerance=1e-5)
+  })
 })
 
 test_that('.calculate_irf', {

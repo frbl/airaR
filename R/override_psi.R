@@ -27,7 +27,6 @@ myPsi.varest <- function(x, nstep=10, ...){
       P <- t(P)
     }
 
-    print(P)
     # Dim3 is the horizon
     dim3 <- dim(Phi)[3]
     for(i in 1:dim3){
