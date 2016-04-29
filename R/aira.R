@@ -130,7 +130,7 @@ Aira <- setRefClass('Aira',
 
       if(plot_results) plot(result)
 
-      # In order to be able to support normal irf (not only bootstrapped irf) we should incorporate rounding errors. 
+      # In order to be able to support normal irf (not only bootstrapped irf) we should incorporate rounding errors.
       threshold <- 1e-4
       low <- (lower > threshold)
       high <- (upper < -threshold)
