@@ -123,6 +123,7 @@ Aira <- setRefClass('Aira',
         lower <- result$irf[[variable_name]]
         upper <- lower
       } else {
+        print('Determining with bootstrap')
         result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
         lower <- result$Lower[[variable_name]]
         upper <- result$Upper[[variable_name]]

@@ -19,8 +19,8 @@ run_aira <- function(variable_to_shock, variable_to_respond, model, name) {
   system(paste('pdfcrop', filename, filename, sep=" "))
 
   # We expect the effect to be between 1.5 and three days
-  print(paste(name, ':', result, 'minutes (', variable_to_shock, 'on', variable_to_respond,')'))
-  result
+  print(paste(name, ':', result$length_in_minutes, 'minutes (', variable_to_shock, 'on', variable_to_respond,')'))
+  result$length_in_minutes
 }
 
 var_model_pp1 <- function() {
@@ -99,9 +99,9 @@ their_results_order_1 <- matrix(c(5,0,
 #                          00,1), ncol=length(pp1), byrow = TRUE)
 
 rownames(their_results_order_1) <- row_names
-rownames(their_results_order_2) <- row_names
+#rownames(their_results_order_2) <- row_names
 colnames(their_results_order_1) <- col_names
-colnames(their_results_order_2) <- col_names
+#colnames(their_results_order_2) <- col_names
 
 # Print results in Latex table
 x <- data.frame(

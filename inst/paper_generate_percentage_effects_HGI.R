@@ -3,7 +3,7 @@ library('xtable')
 source('inst/generate_test_functions.R')
 set.seed(12345)
 test_model <- function(model, negative_variables) {
-  aira <- Aira$new(bootstrap_iterations = 200, horizon= 10, var_model = model,
+  aira <- Aira$new(bootstrap_iterations = bootstrap_iterations, horizon= 10, var_model = model,
                    orthogonalize= FALSE, reverse_order=FALSE) # Reverse order is order 2
   set_exo(model)
   improve_onrust <- aira$determine_percentage_effect('onrust', -10)
@@ -17,7 +17,6 @@ test_model <- function(model, negative_variables) {
 }
 
 negative_variables <- c('onrust')
-bust <- FALSE
 # Check if any of the models give errors
 model <- testdata_var_model_100849(bust)
 #plot(vars::irf(model, boot=FALSE, ortho=FALSE))
@@ -45,7 +44,6 @@ print(p100551)
 print(p112098)
 print(p110478)
 print(p100713)
-
 
 decrease_onrust <- data.frame(
   'decrease.feeling.nervous.by.changing.activity' = c(p100849$improve_onrust.beweging, p100551$improve_onrust.beweging, p112098$improve_onrust.beweging, p110478$improve_onrust.beweging, p100713$improve_onrust.beweging),
