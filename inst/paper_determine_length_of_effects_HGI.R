@@ -26,7 +26,6 @@ test_model <- function(model, negative_variables) {
 }
 
 negative_variables <- c('onrust')
-bust <- FALSE
 # Check if any of the models give errors
 model <- testdata_var_model_100849(bust)
 #plot(vars::irf(model, boot=FALSE, ortho=FALSE))
