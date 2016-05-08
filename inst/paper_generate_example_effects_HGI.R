@@ -52,7 +52,7 @@ rownames(x)<- paste('Person',1:dim(x)[1])
 data.frame(x)
 
 table <- xtable(x, label="tab:effects_in_aira",
-                caption='Effects of Feeling less nervous, relaxation and activity on well-being', digits = 3)
+                caption='Effects of Feeling less nervous, relaxation and activity on well-being, in terms of standard deviations.', digits = 3)
 print(table,
       file='inst/output/tab_effects_in_aira.tex',
       sanitize.text.function=function(str)gsub(" "," ",str,fixed=TRUE),
