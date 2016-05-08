@@ -1,4 +1,6 @@
 rm(list=ls(pos='.GlobalEnv',all=TRUE),pos='.GlobalEnv')
+unloadNamespace('aira')
+
 bootstrap_iterations <<- 200
 bust <<- TRUE
 # Set the seed everytime, so we can rerun each of the tests individually

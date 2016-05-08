@@ -88,7 +88,7 @@ Aira <- setRefClass('Aira',
 
         effect <- .calculate_irf(variable_name, variable_to_improve)
         if (abs(effect) < 0.0001) {
-          total[[variable_name]] <- Inf
+          total[[variable_name]] <- list(percentage = Inf, length_of_effect = Inf)
           next
         }
 
@@ -106,7 +106,7 @@ Aira <- setRefClass('Aira',
 
         needed_difference <- needed_difference / denominator
 
-        total[[variable_name]] <- needed_difference * 100
+        total[[variable_name]] <- list(percentage = needed_difference * 100, length_of_effect = length_of_effect)
       }
       total
     },
