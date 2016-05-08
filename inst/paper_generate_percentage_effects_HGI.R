@@ -47,7 +47,7 @@ print(p100713)
 
 decrease_onrust <- data.frame(
   'decrease.feeling.nervous.by.changing.activity' = c(p100849$improve_onrust.beweging.percentage, p100551$improve_onrust.beweging.percentage, p112098$improve_onrust.beweging.percentage, p110478$improve_onrust.beweging.percentage, p100713$improve_onrust.beweging.percentage),
-  'decrease.feeling.nervous.by.changing.relaxation' = c(p100849$improve_onrust.ontspanning.percentage.percentage, p100551$improve_onrust.ontspanning.percentage, p112098$improve_onrust.ontspanning.percentage, p110478$improve_onrust.ontspanning.percentage, p100713$improve_onrust.ontspanning.percentage)
+  'decrease.feeling.nervous.by.changing.relaxation' = c(p100849$improve_onrust.ontspanning.percentage, p100551$improve_onrust.ontspanning.percentage, p112098$improve_onrust.ontspanning.percentage, p110478$improve_onrust.ontspanning.percentage, p100713$improve_onrust.ontspanning.percentage)
   )
 
 increase_activity <- data.frame(
