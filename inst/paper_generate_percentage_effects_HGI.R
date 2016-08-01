@@ -6,16 +6,19 @@ test_model <- function(model, negative_variables) {
   aira <- Aira$new(bootstrap_iterations = bootstrap_iterations, horizon= 10, var_model = model,
                    orthogonalize= FALSE, reverse_order=FALSE) # Reverse order is order 2
   set_exo(model)
-  improve_onrust <- aira$determine_percentage_effect('onrust', -10)
-  improve_activity <- aira$determine_percentage_effect('beweging', 10)
-  improve_ontspanning <- aira$determine_percentage_effect('ontspanning', 10)
+  improve_onrust <- aira$determine_possible_improvement('onrust')
+  #improve_onrust <- aira$determine_percentage_effect('onrust', -10)
+  improve_activity <- aira$determine_possible_improvement('beweging')
+  #improve_activity <- aira$determine_percentage_effect('beweging', 10)
+  improve_ontspanning <- aira$determine_possible_improvement('ontspanning')
+  #improve_ontspanning <- aira$determine_percentage_effect('ontspanning', 10)
   data.frame(
     improve_onrust = improve_onrust,
     improve_activity = improve_activity,
     improve_ontspanning = improve_ontspanning
   )
 }
-
+bootstrap_iterations <<- 200
 negative_variables <- c('onrust')
 # Check if any of the models give errors
 model <- testdata_var_model_100849(bust)

@@ -75,6 +75,43 @@ Aira <- setRefClass('Aira',
       effect_matrix
     },
 
+    determine_possible_improvement = function(variable_to_improve) {
+      "Determines which variable could aid the provided variable in improvement (other than the provided variable).
+       The returned value is the maximum change possible by changing one of the variables.
+       @param variable_to_improve the variable to determine how to change it."
+      total <- list()
+      for (variable in 1:var_model$K) {
+        variable_name <- .get_variable_name(variable)
+        if (variable_name == variable_to_improve)
+          next
+
+        # Effect the total effect the variable_name had on the variable_to_improve
+        effect <- .calculate_irf(variable_name, variable_to_improve) * sd(var_model$y[,variable_name])
+        if (abs(effect) < 0.0001) {
+          total[[variable_name]] <- list(percentage = Inf, length_of_effect = Inf)
+          next
+        }
+
+        length_of_effect <- determine_length_of_effect(variable_name, variable_to_improve, 1, first_effect_only=FALSE, plot_results=FALSE)
+        length_of_effect <- ceiling(length_of_effect$effective_horizon)
+
+        score <- mean(var_model$y[,variable_to_improve]) * length_of_effect
+        print(mean(var_model$y[,variable_to_improve]))
+        print(length_of_effect)
+
+        # Score is now the total improvement a 1 sd shock in variable causes
+        score <- score + effect
+
+
+        total[[variable_name]] <- list(percentage = effect, length_of_effect = length_of_effect)
+      }
+      total
+    },
+
+    determine_percentage_effect_over_time = function(variable_to_improve) {
+
+    },
+
     determine_percentage_effect = function(variable_to_improve, percentage) {
       "Returns the percentage for each variable in the network (other then the provided variable)
       to be changed in order to change the variable_to_improve with the given percentage.
@@ -193,26 +230,31 @@ Aira <- setRefClass('Aira',
       result <- ''
       key <- paste(variable_name, response, sep="|")
 
-      # If we have processed this call before, return it from the cache
-      if((key %in% names(irf_cache)) & !plot_results) return(irf_cache[[key]])
+      # If we have not processed this call before, return it from the cache
+      if(!(key %in% names(irf_cache)) || plot_results) {
+        if (bootstrap_iterations > 0) {
+          result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
+        } else {
+          result <- vars_functions$irf(from=variable_name, to=response)
+        }
+        irf_cache[[key]] <<- result
+      }
+
       if (bootstrap_iterations > 0) {
         ## TERRIBLE;
         set_exo(var_model)
-
-        result <- vars_functions$bootstrapped_irf(from=variable_name, to=response)
         low  <- (result$Lower[[variable_name]] * (result$Lower[[variable_name]] > 0))
         high <- (result$Upper[[variable_name]] * (result$Upper[[variable_name]] < 0))
         sign_effects <- (low + high)[, !dimnames(result$Lower[[variable_name]])[[2]] %in% variable_name]
         resulting_score <- sum(sign_effects)
       } else {
-        result <- vars_functions$irf(from=variable_name, to=response)
         resulting_score <- result$irf[[variable_name]][, !dimnames(result$irf[[variable_name]])[[2]] %in% variable_name, drop=FALSE]
         resulting_score <- as.numeric(colSums(resulting_score))
       }
       if (plot_results) plot(result)
 
-      irf_cache[[key]] <<- resulting_score
-      resulting_score
+
+      list(score=resulting_score, result=result)
     }
   )
 )
