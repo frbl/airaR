@@ -48,7 +48,7 @@ Aira <- setRefClass('Aira',
           # If the current response variable is a negative variable, we'd like to invert the result
           multiplier <- ifelse(response_name %in% negative_variables, -1, 1)
 
-          irf <- multiplier * .calculate_irf(variable_name=variable_name, response=response_name)
+          irf <- multiplier * .calculate_irf(variable_name=variable_name, response=response_name)$score
           total[[variable_name]] <- total[[variable_name]] + irf
         }
       }
@@ -68,7 +68,7 @@ Aira <- setRefClass('Aira',
         for (response_name in 1:var_model$K) {
           if (variable == response_name & !include_autoregressive_effects) next # Don't consider autocorrelation
           response_name <- .get_variable_name(response_name)
-          result <- .calculate_irf(variable_name = variable_name, response = response_name)
+          result <- .calculate_irf(variable_name = variable_name, response = response_name)$score
           effect_matrix[variable_name, response_name] <- result
         }
       }
@@ -79,6 +79,40 @@ Aira <- setRefClass('Aira',
       "Determines which variable could aid the provided variable in improvement (other than the provided variable).
        The returned value is the maximum change possible by changing one of the variables.
        @param variable_to_improve the variable to determine how to change it."
+      # total <- list()
+      # for (variable in 1:var_model$K) {
+      #   variable_name <- .get_variable_name(variable)
+      #   if (variable_name == variable_to_improve)
+      #     next
+      #
+      #   # Effect the total effect the variable_name had on the variable_to_improve
+      #   effect <- .calculate_irf(variable_name, variable_to_improve)$score * sd(var_model$y[,variable_name])
+      #   if (abs(effect) < 0.0001) {
+      #     total[[variable_name]] <- list(percentage = Inf, length_of_effect = Inf)
+      #     next
+      #   }
+      #
+      #   length_of_effect <- determine_length_of_effect(variable_name, variable_to_improve, 1, first_effect_only=FALSE, plot_results=FALSE)
+      #   length_of_effect <- ceiling(length_of_effect$effective_horizon)
+      #
+      #   score <- mean(var_model$y[,variable_to_improve]) * length_of_effect
+      #   print(mean(var_model$y[,variable_to_improve]))
+      #   print(length_of_effect)
+      #
+      #   # Score is now the total improvement a 1 sd shock in variable causes
+      #   score <- score + effect
+      #
+      #
+      #   total[[variable_name]] <- list(percentage = effect, length_of_effect = length_of_effect)
+      # }
+      # total
+    },
+
+    determine_percentage_effect_over_time = function(variable_to_improve) {
+      "Determines how much each variable would attribute to improving the variable to improve over time.
+       For each future step the algorithm determines the percentage of effect a variable has when increased.
+       @param variable_to_improve the variable to determine how to change it.
+       @result the output "
       total <- list()
       for (variable in 1:var_model$K) {
         variable_name <- .get_variable_name(variable)
@@ -86,30 +120,29 @@ Aira <- setRefClass('Aira',
           next
 
         # Effect the total effect the variable_name had on the variable_to_improve
-        effect <- .calculate_irf(variable_name, variable_to_improve) * sd(var_model$y[,variable_name])
-        if (abs(effect) < 0.0001) {
-          total[[variable_name]] <- list(percentage = Inf, length_of_effect = Inf)
-          next
+        irf <- .calculate_irf(variable_name, variable_to_improve)
+        effect <- irf$result$irf[[variable_name]][,variable_to_improve]
+        if(!is.null(irf$sign_eff)) {
+          print('Using significant effects')
+          effect <- irf$sign_eff
         }
 
         length_of_effect <- determine_length_of_effect(variable_name, variable_to_improve, 1, first_effect_only=FALSE, plot_results=FALSE)
         length_of_effect <- ceiling(length_of_effect$effective_horizon)
 
-        score <- mean(var_model$y[,variable_to_improve]) * length_of_effect
-        print(mean(var_model$y[,variable_to_improve]))
-        print(length_of_effect)
+        mean_variable_to_improve <- mean(var_model$y[,variable_to_improve])
+        std_variable_to_improve <- sd(var_model$y[,variable_to_improve])
 
-        # Score is now the total improvement a 1 sd shock in variable causes
-        score <- score + effect
+        result = c()
+        for (i in 1:length_of_effect) {
+          cur <- (std_variable_to_improve * effect[i])/mean_variable_to_improve
+          cur <- cur * 100
+          result <- c(result, cur)
+        }
 
-
-        total[[variable_name]] <- list(percentage = effect, length_of_effect = length_of_effect)
+        total[[variable_name]] <- result
       }
       total
-    },
-
-    determine_percentage_effect_over_time = function(variable_to_improve) {
-
     },
 
     determine_percentage_effect = function(variable_to_improve, percentage) {
@@ -123,7 +156,7 @@ Aira <- setRefClass('Aira',
         if (variable_name == variable_to_improve)
           next
 
-        effect <- .calculate_irf(variable_name, variable_to_improve)
+        effect <- .calculate_irf(variable_name, variable_to_improve)$score
         if (abs(effect) < 0.0001) {
           total[[variable_name]] <- list(percentage = Inf, length_of_effect = Inf)
           next
@@ -228,7 +261,7 @@ Aira <- setRefClass('Aira',
       "Calculates IRF and returns the total effect"
       resulting_score <- 0
       result <- ''
-      key <- paste(variable_name, response, sep="|")
+      key <- variable_name
 
       # If we have not processed this call before, return it from the cache
       if(!(key %in% names(irf_cache)) || plot_results) {
@@ -239,7 +272,9 @@ Aira <- setRefClass('Aira',
         }
         irf_cache[[key]] <<- result
       }
+      result <- irf_cache[[key]]
 
+      sign_effects <- NULL
       if (bootstrap_iterations > 0) {
         ## TERRIBLE;
         set_exo(var_model)
@@ -253,8 +288,7 @@ Aira <- setRefClass('Aira',
       }
       if (plot_results) plot(result)
 
-
-      list(score=resulting_score, result=result)
+      list(score=resulting_score, result=result, sign_eff=sign_effects)
     }
   )
 )
