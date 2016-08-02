@@ -20,8 +20,9 @@ convert_var_to_positive <- function(var_model, negative_variables, direction = '
       if (var_name %in% negative_variables) {
         var_model$varresult[[var_name]]$coefficients <- var_model$varresult[[var_name]]$coefficients  * -1
       }
-
       res <- generate_masking_vector(var_model$varresult[[var_name]]$coefficients, negative_variables = negative_variables)
+      print(paste('Masking vector for', var_name)
+      print(res)
       var_model$varresult[[var_name]]$coefficients <- var_model$varresult[[var_name]]$coefficients * res
     }
   }
