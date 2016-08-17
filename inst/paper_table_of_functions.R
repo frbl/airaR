@@ -4,10 +4,10 @@ res <- data.frame(
     DetermineOptimalNode = c('Yes','Yes'),
     DetermineLengthOfEffect = c('Yes','Yes'),
     DeterminePercentageEffect = c('Yes','Yes'),
-    IRF = c('Yes','Yes'),
+    'Impulse Response Function Analysis' = c('Yes','Yes'),
     Animations = c('Yes','No'),
     Interactivity = c('Yes','No'),
-    OIRF = c('No','Yes'),
+    'Orthogonalized Impulse Response Function Analysis' = c('No','Yes'),
     Bootstrapping = c('No','Yes')
 )
 res <- t(res)
