@@ -5,7 +5,7 @@ res <- data.frame(
     DetermineLengthOfEffect = c('Yes','Yes'),
     DeterminePercentageEffect = c('Yes','Yes'),
     'Impulse Response Function Analysis' = c('Yes','Yes'),
-    Animations = c('Yes','No'),
+    'Animations and Visual representation' = c('Yes','No'),
     Interactivity = c('Yes','No'),
     'Orthogonalized Impulse Response Function Analysis' = c('No','Yes'),
     Bootstrapping = c('No','Yes')
@@ -17,7 +17,7 @@ table <- xtable(res, label="tab:supported_functions",
                  caption='Supported functions of both implementations of AIRA', digits = 3, auto= TRUE)
 print(table,
        file='inst/output/tab_supported_functions.tex',
-       sanitize.text.function=function(str)gsub(" "," ",str,fixed=TRUE),
+       sanitize.text.function=function(str)gsub("."," ",str,fixed=TRUE),
        floating=TRUE,
        booktabs=TRUE, floating.environment = 'table')
 

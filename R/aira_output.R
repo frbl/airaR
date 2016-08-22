@@ -97,8 +97,9 @@ AiraOutput <- setRefClass(
       index <- 0
       for (name in names(percentage_effects)) {
         index <- index + 1
-        if(percentage_effects == Inf || percentage_effects == -Inf) next
-        effect <- round(percentage_effects[[name]] * 100)
+        percentage_effect = percentage_effects[[name]]$percentage
+        if(abs(percentage_effect) == Inf) next
+        effect <- round(percentage_effect)
         direction <- ifelse(sign(effect) == 1, "increasing", "decreasing")
         direction_improvement <- ifelse(sign(percentage_to_improve) == 1, "increase", "decrease")
         result <- paste(result, "You could ",direction_improvement," your ", variable_to_improve, " with ", abs(percentage_to_improve), '% ', sep ="")

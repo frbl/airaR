@@ -5,8 +5,12 @@ run_aira <- function(variable_to_improve, percentage, model, name) {
   set_exo(model)
   aira_output <- AiraOutput$new(aira = aira)
   result <- aira$determine_percentage_effect(variable_to_improve, percentage)
-  output <- aira_output$print_percentage_effect(variable_to_improve = variable_to_improve, percentage_to_improve = percentage, print_newlines = FALSE,
-                                      print_title = FALSE)
+  print(result)
+  result <- lapply(result, `[[`, 1)
+  print(result)
+  output <- aira_output$print_percentage_effect(variable_to_improve = variable_to_improve,
+                                                percentage_to_improve = percentage, print_newlines = FALSE,
+                                                print_title = FALSE)
   print(output)
   result
 }
@@ -70,7 +74,7 @@ row_names <- c('pp1','pp2','pp4','pp5')
 col_names <- c('A>D','D>A')
 
 our_results <- matrix(c(pp1,pp2,pp4,pp5),ncol=length(pp1))
-our_results <- our_results * 100
+our_results <- our_results
 our_results <- round(our_results, 2)
 our_results <- matrix(gsub(Inf, "No effect", our_results),ncol=length(pp1))
 our_results <- matrix(gsub("([0-9])$", "\\1\\\\%", our_results, perl=TRUE),ncol=length(pp1))
@@ -79,8 +83,8 @@ colnames(our_results) <- col_names
 our_results
 
 x <- data.frame(
-  mine_som_beweg_uur = our_results
-)
+                mine_som_beweg_uur = our_results
+                )
 
 names(x) <- c("Activity to improve Depression", "Depression to improve Activity (\\textsc{aira})")
 table <- xtable(x, label="tab:effects",
