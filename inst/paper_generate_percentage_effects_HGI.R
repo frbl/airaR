@@ -103,13 +103,13 @@ print(table,
 
 print(x)
 sink('inst/output/item_percentage_effects_in_aira.tex')
-print("\\begin{itemize}")
+cat("\\begin{itemize}")
 for (r in 1:nrow(x)) {
   for (c in 1:ncol(x)) {
     if(x[r,c] == "$\\infty$") next
     res = paste("\\item", rownames(x)[r], 'can', colnames(x)[c],'by', x[r,c])
-    print(res)
+    cat(res)
   }
 }
-print("\\end{itemize}")
+cat("\\end{itemize}")
 sink()
