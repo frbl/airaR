@@ -87,11 +87,19 @@ our_results <- matrix(paste(round(our_results, 1), ' minutes (', round(our_resul
 rownames(our_results) <- row_names
 colnames(our_results) <- col_names
 # A > D, D > A
+
 their_results_order_1 <- matrix(c(5,0,
                                   3,0,
                                   2,6, # The first 2 is 2 * 1 (1 at lag 0, 1 at lag 2)
                                   0,1), ncol=length(pp1), byrow = TRUE)
 
+their_results_order_1 <- matrix(paste(their_results_order_1, 'days'), ncol=length(pp1))
+our_results_eyballed<- matrix(c(1,0,
+                                1,0,
+                                0,6, # The first 2 is 2 * 1 (1 at lag 0, 1 at lag 2)
+                                0,0), ncol=length(pp1), byrow = TRUE)
+
+our_results_eyballed <- matrix(paste(our_results_eyballed, 'days'), ncol=length(pp1))
 
 #their_results_order_2 <- matrix(c(3,1, # the 3 is 1 + 2 (1 at lag 1, 2 at lag 3,4)
 #                          00,2,
@@ -102,24 +110,27 @@ rownames(their_results_order_1) <- row_names
 #rownames(their_results_order_2) <- row_names
 colnames(their_results_order_1) <- col_names
 #colnames(their_results_order_2) <- col_names
+rownames(our_results_eyballed) <- row_names
+colnames(our_results_eyballed) <- col_names
 
 # Print results in Latex table
 x <- data.frame(
   mine_som_beweg_uur = our_results,
-  their_som_beweg_uur_order1 = their_results_order_1
+  their_som_beweg_uur_order1 = their_results_order_1,
   #their_som_beweg_uur_order2 = their_results_order_2
+  our_results_eyballed = our_results_eyballed
 )
 
 x
 
 
-column_names <- c("A $\\rightarrow$ D (aira)", "D $\\rightarrow$ A (aira)", "A $\\rightarrow$ D (Rosmalen 1)", "D $\\rightarrow$ A (Rosmalen 1)", "A $\\rightarrow$ D (Rosmalen 2)", "D $\\rightarrow$ A (Rosmalen 2)")
-names(x) <- column_names[1:4]
+column_names <- c("A $\\rightarrow$ D (1)", "D $\\rightarrow$ A (1)", "A $\\rightarrow$ D (2)", "D $\\rightarrow$ A (2)", "A $\\rightarrow$ D (3)", "D $\\rightarrow$ A (3)")
+names(x) <- column_names
 
 print(x)
 
 table <- xtable(x, label="tab:comparison",
-                caption='Comparison between the outcomes of AIRA and results from the study by \\citeauthor{RefWorks:4}~\\cite{RefWorks:4}.', digits = 1)
+                caption='Comparison between the outcomes of AIRA (1) and results from the study by \\citeauthor{RefWorks:4} (2,3)~\\cite{RefWorks:4}. The table shows botw the results from the paper (2) and from the Rosmalen VAR models fitted using the VARS package (3)', digits = 1)
 print(table,
       file='inst/output/tab_comparison.tex',
       sanitize.text.function=function(str)gsub(" "," ",str,fixed=TRUE),
