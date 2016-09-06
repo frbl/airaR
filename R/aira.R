@@ -154,13 +154,13 @@ Aira <- setRefClass('Aira',
         } else {
           if (effect_started) {
             if (low[i-1]){
-              end = i + (1 - ((lower[i] - threshold) / (lower[i] - lower[i - 1])))
+              end = i - 1 + (1 - ((lower[i] - threshold) / (lower[i] - lower[i - 1])))
             } else if(high[i-1]) { # high[i-1] == true
-              end = i + (1 - ((upper[i] + threshold) / (upper[i] - upper[i - 1])))
+              end = i - 1 + (1 - ((upper[i] + threshold) / (upper[i] - upper[i - 1])))
             }
-            effective_horizon <- end - 1
+            effective_horizon <- end
             effect_started <- FALSE
-            exact_length <- exact_length + ((end - 1) - begin)
+            exact_length <- exact_length + (end - begin)
             if(first_effect_only) break
           }
         }
