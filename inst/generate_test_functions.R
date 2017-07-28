@@ -87,13 +87,32 @@ testdata_var_model_pp5 <- function() {
   var.2c
 }
 
+translate_model <- function(model) {
+  set_exo(model)
+  model_names <- names(model$varresult)
+  model_names <- replace(model_names, model_names=='SomBewegUur', 'Activity')
+  model_names <- replace(model_names, model_names=='SomPHQ', 'Depression')
+  model_names <- replace(model_names, model_names=='lnSomBewegUur', 'Activity')
+  model_names <- replace(model_names, model_names=='lnSomPHQ', 'Depression')
+  names(model$varresult) <- model_names
+
+  names(model$varresult$Activity$coefficients) <- sub(".*SomBewegUur", 'Activity', names(model$varresult$Activity$coefficients))
+  names(model$varresult$Activity$coefficients) <- sub(".*SomPHQ", 'Depression', names(model$varresult$Activity$coefficients))
+
+  names(model$varresult$Depression$coefficients) <- sub(".*SomBewegUur", 'Activity', names(model$varresult$Depression$coefficients))
+  names(model$varresult$Depression$coefficients) <- sub(".*SomPHQ", 'Depression', names(model$varresult$Depression$coefficients))
+
+  colnames(model$y) <- sub(".*SomPHQ", 'Depression', colnames(model$y))
+  colnames(model$y) <- sub(".*SomBewegUur", 'Activity', colnames(model$y))
+  model
+}
 
 ###############################################
 #               HGI TEST FUNCTIONS            #
 ###############################################
 loadData <- function(file) {
   data <- read.csv(paste(base_dir, "inst/csv/",file,".csv", sep=""), stringsAsFactors = FALSE)
-  included_columns <- c('onrust', 'ontspanning', 'beweging')
+  included_columns <- c('somberheid', 'tekortschieten', 'ontspanning')
 
   # Remove unused columns
   data <- data[,(names(data) %in% included_columns)]

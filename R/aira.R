@@ -154,13 +154,13 @@ Aira <- setRefClass('Aira',
         } else {
           if (effect_started) {
             if (low[i-1]){
-              end = i + (1 - ((lower[i] - threshold) / (lower[i] - lower[i - 1])))
+              end = i - 1 + (1 - ((lower[i] - threshold) / (lower[i] - lower[i - 1])))
             } else if(high[i-1]) { # high[i-1] == true
-              end = i + (1 - ((upper[i] + threshold) / (upper[i] - upper[i - 1])))
+              end = i - 1 + (1 - ((upper[i] + threshold) / (upper[i] - upper[i - 1])))
             }
-            effective_horizon <- end - 1
+            effective_horizon <- end
             effect_started <- FALSE
-            exact_length <- exact_length + ((end - 1) - begin)
+            exact_length <- exact_length + (end - begin)
             if(first_effect_only) break
           }
         }
@@ -192,7 +192,6 @@ Aira <- setRefClass('Aira',
       resulting_score <- 0
       result <- ''
       key <- paste(variable_name, response, sep="|")
-
       # If we have processed this call before, return it from the cache
       if((key %in% names(irf_cache)) & !plot_results) return(irf_cache[[key]])
       if (bootstrap_iterations > 0) {

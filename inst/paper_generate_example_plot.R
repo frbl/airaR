@@ -67,7 +67,7 @@ d <- melt(real_data, id="x")
 
 real_plot <- ggplot(aes(x=x, value, colour=variable), data=d, show_guide = TRUE) +
   geom_line()+
-  scale_colour_manual(values=c("lightblue", "black", 'forestgreen','orange','darkblue','pink'))+
+  scale_colour_manual(values=c("cornflowerblue", "black", 'forestgreen','orange','darkblue','coral4'))+
   annotate('text', x=0,y=1.4, label='Shock \non agitation')+
   annotate('pointrange', x=0,y=1, ymin=-.2, ymax=1.15, size=.5, colour='red')+
   annotate('segment', x=-.6,y=1.15, yend=1.15, xend=.6, size=.5, colour='red')+
@@ -82,7 +82,8 @@ real_plot <- ggplot(aes(x=x, value, colour=variable), data=d, show_guide = TRUE)
   theme(panel.border = element_blank()) +
   theme(axis.line = element_blank())+
   theme(legend.position="bottom", legend.box = "horizontal")+
-  theme(legend.title=element_blank())+
+  theme(legend.title = element_blank())+
+  theme(legend.text = element_text(size = 18))+
   coord_fixed(ratio = 1.5)
 
 #pdf(file="example_response_aira.pdf", width=1790, height=960)
