@@ -10,7 +10,7 @@ test_model <- function(model, negative_variables) {
   aira$determine_best_node_from_all()
 }
 
-negative_variables <- c('onrust')
+negative_variables <- c('somberheid', 'tekortschieten')
 bust <- FALSE
 # Check if any of the models give errors
 model <- testdata_var_model_100849(bust)
@@ -47,12 +47,12 @@ x <- rbind(
   t(p100713)
 )
 
-colnames(x) <- c("Feeling less nervous", "Relaxation", "Activity")
+colnames(x) <- c("Feeling less gloomy", "Relaxation", "Feeling less inadequate")
 rownames(x)<- paste('Person',1:dim(x)[1])
 data.frame(x)
 
 table <- xtable(x, label="tab:effects_in_aira",
-                caption='Effects of Feeling less nervous, relaxation and activity on well-being, in terms of standard deviations.', digits = 3)
+                caption='Effects of feeling less gloomy, relaxation and feeling less inadequate on well-being, in terms of standard deviations.', digits = 3)
 print(table,
       file='inst/output/tab_effects_in_aira.tex',
       sanitize.text.function=function(str)gsub(" "," ",str,fixed=TRUE),

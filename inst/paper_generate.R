@@ -3,7 +3,7 @@ rm(list=ls(pos='.GlobalEnv',all=TRUE),pos='.GlobalEnv')
 unloadNamespace('aira')
 library('aira')
 bootstrap_iterations <<- 200
-bust <<- FALSE
+bust <<- TRUE
 # Set the seed everytime, so we can rerun each of the tests individually
 set.seed(12345)
 print('>>>>>>>>>> Generating example plot')

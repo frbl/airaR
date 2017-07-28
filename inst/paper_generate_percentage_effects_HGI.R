@@ -6,17 +6,17 @@ test_model <- function(model, negative_variables) {
   aira <- Aira$new(bootstrap_iterations = bootstrap_iterations, horizon= 10, var_model = model,
                    orthogonalize= FALSE, reverse_order=FALSE) # Reverse order is order 2
   set_exo(model)
-  improve_onrust <- aira$determine_percentage_effect('onrust', -10)
-  improve_activity <- aira$determine_percentage_effect('beweging', 10)
-  improve_ontspanning <- aira$determine_percentage_effect('ontspanning', 10)
+  improve_somberheid <- aira$determine_percentage_effect('somberheid', -10)
+  improve_relaxation <- aira$determine_percentage_effect('ontspanning', 10)
+  improve_tekortschieten <- aira$determine_percentage_effect('tekortschieten', -10)
   data.frame(
-             improve_onrust = improve_onrust,
-             improve_activity = improve_activity,
-             improve_ontspanning = improve_ontspanning
+             improve_somberheid = improve_somberheid,
+             improve_relaxation = improve_relaxation,
+             improve_tekortschieten = improve_tekortschieten
              )
 }
 
-negative_variables <- c('onrust')
+negative_variables <- c('somberheid', 'tekortschieten')
 # Check if any of the models give errors
 model <- testdata_var_model_100849(bust)
 #plot(vars::irf(model, boot=FALSE, ortho=FALSE))
@@ -45,25 +45,25 @@ print(p112098)
 print(p110478)
 print(p100713)
 
-decrease_onrust <- data.frame(
-                              'decrease.feeling.nervous.by.changing.activity' = c(p100849$improve_onrust.beweging.percentage, p100551$improve_onrust.beweging.percentage, p112098$improve_onrust.beweging.percentage, p110478$improve_onrust.beweging.percentage, p100713$improve_onrust.beweging.percentage),
-                              'decrease.feeling.nervous.by.changing.relaxation' = c(p100849$improve_onrust.ontspanning.percentage, p100551$improve_onrust.ontspanning.percentage, p112098$improve_onrust.ontspanning.percentage, p110478$improve_onrust.ontspanning.percentage, p100713$improve_onrust.ontspanning.percentage)
+decrease_somberheid <- data.frame(
+                              'decrease.feeling.gloomy.by.changing.relaxation' = c(p100849$improve_somberheid.ontspanning.percentage, p100551$improve_somberheid.ontspanning.percentage, p112098$improve_somberheid.ontspanning.percentage, p110478$improve_somberheid.ontspanning.percentage, p100713$improve_somberheid.ontspanning.percentage),
+                              'decrease.feeling.gloomy.by.changing.feeling.inadequate' = c(p100849$improve_somberheid.tekortschieten.percentage, p100551$improve_somberheid.tekortschieten.percentage, p112098$improve_somberheid.tekortschieten.percentage, p110478$improve_somberheid.tekortschieten.percentage, p100713$improve_somberheid.tekortschieten.percentage)
                               )
 
-increase_activity <- data.frame(
-                                'increase.activity.by.changing.feeling.nervous' = c(p100849$improve_activity.onrust.percentage, p100551$improve_activity.onrust.percentage, p112098$improve_activity.onrust.percentage, p110478$improve_activity.onrust.percentage, p100713$improve_activity.onrust.percentage),
-                                'increase.activity.by.changing.relaxation' = c(p100849$improve_activity.ontspanning.percentage, p100551$improve_activity.ontspanning.percentage, p112098$improve_activity.ontspanning.percentage, p110478$improve_activity.ontspanning.percentage, p100713$improve_activity.ontspanning.percentage)
+increase_relaxation <- data.frame(
+                                'increase.relaxation.by.changing.feeling.gloomy' = c(p100849$improve_relaxation.somberheid.percentage, p100551$improve_relaxation.somberheid.percentage, p112098$improve_relaxation.somberheid.percentage, p110478$improve_relaxation.somberheid.percentage, p100713$improve_relaxation.somberheid.percentage),
+                                'increase.relaxation.by.changing.feeling.inadequate' = c(p100849$improve_relaxation.tekortschieten.percentage, p100551$improve_relaxation.tekortschieten.percentage, p112098$improve_relaxation.tekortschieten.percentage, p110478$improve_relaxation.tekortschieten.percentage, p100713$improve_relaxation.tekortschieten.percentage)
                                 )
 
-increase_relaxation <- data.frame(
-                                  'increase.relaxation.by.changing.feeling.nervous.' = c(p100849$improve_ontspanning.onrust.percentage, p100551$improve_ontspanning.onrust.percentage, p112098$improve_ontspanning.onrust.percentage, p110478$improve_ontspanning.onrust.percentage, p100713$improve_ontspanning.onrust.percentage),
-                                  'increase.relaxation.by.changing.activity' = c(p100849$improve_ontspanning.beweging.percentage, p100551$improve_ontspanning.beweging.percentage, p112098$improve_ontspanning.beweging.percentage, p110478$improve_ontspanning.beweging.percentage, p100713$improve_ontspanning.beweging.percentage)
+increase_inadequate <- data.frame(
+                                  'decrease.feeling.inadequate.by.changing.feeling.gloomy' = c(p100849$improve_tekortschieten.somberheid.percentage, p100551$improve_tekortschieten.somberheid.percentage, p112098$improve_tekortschieten.somberheid.percentage, p110478$improve_tekortschieten.somberheid.percentage, p100713$improve_tekortschieten.somberheid.percentage),
+                                  'decrease.feeling.inadequate.by.changing.relaxation' = c(p100849$improve_tekortschieten.ontspanning.percentage, p100551$improve_tekortschieten.ontspanning.percentage, p112098$improve_tekortschieten.ontspanning.percentage, p110478$improve_tekortschieten.ontspanning.percentage, p100713$improve_tekortschieten.ontspanning.percentage)
                                   )
 
 x <- rbind(
-           t(decrease_onrust),
-           t(increase_activity),
-           t(increase_relaxation)
+           t(decrease_somberheid),
+           t(increase_relaxation),
+           t(increase_inadequate)
            )
 x <- t(x)
 
@@ -93,7 +93,7 @@ x[x == Inf] <- '$\\infty$'
 
 #
 table <- xtable(x, label="tab:percentage_effects_in_aira",
-                caption='Effects of Feeling less nervous, relaxation and activity on well-being', digits = 3)
+                caption='Effects of Feeling less gloom, inadequate and relaxation on well-being', digits = 3)
 print(table,
       file='inst/output/tab_percentage_effects_in_aira.tex',
       sanitize.text.function=function(str)gsub(" "," ",str,fixed=TRUE),
