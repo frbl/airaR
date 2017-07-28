@@ -96,7 +96,7 @@ their_results_order_1 <- matrix(c(5,0,
 their_results_order_1 <- matrix(paste(their_results_order_1, 'days'), ncol=length(pp1))
 our_results_eyballed<- matrix(c(1,0,
                                 1,0,
-                                0,6, # The first 2 is 2 * 1 (1 at lag 0, 1 at lag 2)
+                                0,7, # The first 2 is 2 * 1 (1 at lag 0, 1 at lag 2)
                                 0,0), ncol=length(pp1), byrow = TRUE)
 
 our_results_eyballed <- matrix(paste(our_results_eyballed, 'days'), ncol=length(pp1))
@@ -130,7 +130,7 @@ names(x) <- column_names
 print(x)
 
 table <- xtable(x, label="tab:comparison",
-                caption='Comparison between the outcomes of AIRA (1) and results from the study by \\citeauthor{RefWorks:4} (2,3)~\\cite{RefWorks:4}. The table shows botw the results from the paper (2) and from the Rosmalen VAR models fitted using the VARS package (3)', digits = 1)
+                caption='Comparison between the outcomes of AIRA (1) and results from the study by \\citeauthor{RefWorks:4} (2,3)~\\cite{RefWorks:4}. The table shows both the results from the paper (2) and from the Rosmalen VAR models fitted using the VARS package (3)', digits = 1)
 print(table,
       file='inst/output/tab_comparison.tex',
       sanitize.text.function=function(str)gsub(" "," ",str,fixed=TRUE),

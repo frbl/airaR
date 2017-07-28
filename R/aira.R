@@ -192,7 +192,6 @@ Aira <- setRefClass('Aira',
       resulting_score <- 0
       result <- ''
       key <- paste(variable_name, response, sep="|")
-
       # If we have processed this call before, return it from the cache
       if((key %in% names(irf_cache)) & !plot_results) return(irf_cache[[key]])
       if (bootstrap_iterations > 0) {
