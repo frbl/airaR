@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 require(ggplot2)
 require(reshape2)
 output <- c()

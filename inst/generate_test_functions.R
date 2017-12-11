@@ -1,7 +1,7 @@
-base_dir <- 'tests/testthat/'
+base_dir <- '~/vault/Datasets/Rosmalen/'
 library('Amelia')
 testdata_var_model_pp1 <- function() {
-  data_set <- autovar::read_spss(paste(base_dir, "inst/pp1_nieuw_compleet.sav", sep=""), to.data.frame=TRUE)
+  data_set <- autovar::read_spss(paste(base_dir, "pp1_nieuw_compleet.sav", sep=""), to.data.frame=TRUE)
   endodata <- data_set[,c('SomBewegUur', 'SomPHQ')]
   exogedata <- data_set[,c('UitbijterPHQ','UitbijterBeweg')]
   #assign("endodata", "endodata", envir = .GlobalEnv)
@@ -20,7 +20,7 @@ testdata_var_model_pp1 <- function() {
 }
 
 testdata_var_model_pp2 <- function() {
-  data_set <- autovar::read_spss(paste(base_dir, "inst/pp2_nieuw_compleet_64dagen.sav", sep=""), to.data.frame=TRUE)
+  data_set <- autovar::read_spss(paste(base_dir, "pp2_nieuw_compleet_64dagen.sav", sep=""), to.data.frame=TRUE)
   endodata <- data_set[,c('lnSomBewegUur', 'lnSomPHQ')]
   exogedata <- data_set[,c('UitbijterBeweg'), drop=FALSE]
   #assign("endodata", "endodata", envir = .GlobalEnv)
@@ -38,7 +38,7 @@ testdata_var_model_pp2 <- function() {
 }
 
 testdata_var_model_pp4 <- function() {
-  data_set <- autovar::read_spss(paste(base_dir, "inst/pp4_nieuw_compleet_met_140min.sav", sep=""), to.data.frame=TRUE)
+  data_set <- autovar::read_spss(paste(base_dir, "pp4_nieuw_compleet_met_140min.sav", sep=""), to.data.frame=TRUE)
   endodata <- data_set[,c('SomPHQ', 'SomBewegUur')]
   exogedata <- data_set[,c('Work', 'UitbijterPHQ', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')]
   #assign("endodata", "endodata", envir = .GlobalEnv)
@@ -71,7 +71,7 @@ testdata_var_model_pp4 <- function() {
 }
 
 testdata_var_model_pp5 <- function() {
-  data_set <- autovar::read_spss(paste(base_dir, "inst/pp5_nieuw_compleet.sav", sep=""), to.data.frame=TRUE)
+  data_set <- autovar::read_spss(paste(base_dir, "pp5_nieuw_compleet.sav", sep=""), to.data.frame=TRUE)
   endodata <- data_set[,c('lnSomBewegUur', 'lnSomPHQ')]
   exogedata <- data_set[,c('Uitbijter_27'), drop=FALSE]
 
@@ -111,7 +111,7 @@ translate_model <- function(model) {
 #               HGI TEST FUNCTIONS            #
 ###############################################
 loadData <- function(file) {
-  data <- read.csv(paste(base_dir, "inst/csv/",file,".csv", sep=""), stringsAsFactors = FALSE)
+  data <- read.csv(paste(base_dir, "csv/",file,".csv", sep=""), stringsAsFactors = FALSE)
   included_columns <- c('somberheid', 'tekortschieten', 'ontspanning')
 
   # Remove unused columns
