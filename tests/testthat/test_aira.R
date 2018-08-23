@@ -1,4 +1,4 @@
-context('aira')
+context('Aira')
 fast = TRUE
 .set_exo <- function(model) {
   # This is terrible practice. Irf requires the exogen matrix to be available, which is not available anymore.
@@ -15,7 +15,7 @@ fast = TRUE
 }
 
 testdata_var_model <- function() {
-  data_set <- autovar::read_spss("inst/pp1_nieuw_compleet.sav", to.data.frame=TRUE)
+  data_set <- autovar::read_spss("inst/pp1.sav", to.data.frame=TRUE)
   endodata <- data_set[,c('SomBewegUur', 'SomPHQ')]
   exogedata <- data_set[,c('UitbijterPHQ','UitbijterBeweg')]
   #assign("endodata", "endodata", envir = .GlobalEnv)
@@ -155,7 +155,7 @@ test_that('determine_percentage_effect', {
 
     # The effect of SOMPHQ is 0 (or at least extremely small), therefore it would take an infinite amount of
     # somphq to make sombeweguur larger
-    expect_equal(tot$SomPHQ, Inf, tolerance=1e-4)
+    expect_equal(tot$SomPHQ$percentage, Inf, tolerance=1e-4)
 
     tot <- aira$determine_percentage_effect("SomPHQ", 10)
 
@@ -165,7 +165,7 @@ test_that('determine_percentage_effect', {
     # The effect of SomBewegUur on SomPhq is not null, so this can have an effect
     #TODO: Currently this is a magic number, change this once the formula is really final
     expected <- -76.5
-    expect_equal(tot$SomBewegUur, expected, tolerance=1e-2)
+    expect_equal(tot$SomBewegUur$percentage, expected, tolerance=1e-2)
   })
 
   test_that('should call the lenght of effect function', {
@@ -178,7 +178,7 @@ test_that('determine_percentage_effect', {
 
     # The effect on the variable itself should not be included
     expect_equal(result$SomBewegUur, NULL)
-    expect_equal(result$SomPHQ, Inf)
+    expect_equal(result$SomPHQ$percentage, Inf)
 
     result <- aira$determine_percentage_effect("SomPHQ", 10)
 
@@ -187,7 +187,7 @@ test_that('determine_percentage_effect', {
 
     #TODO: Currently this is a magic number, change this once the formula is really final
     expected <- -170.4
-    expect_equal(result$SomBewegUur, expected, tolerance=1e-2)
+    expect_equal(result$SomBewegUur$percentage, expected, tolerance=1e-2)
   })
 
   test_that('with a higher percentage', {
@@ -197,7 +197,7 @@ test_that('determine_percentage_effect', {
 
     # The effect on the variable itself should not be included
     expect_equal(result$SomBewegUur, NULL)
-    expect_equal(result$SomPHQ, Inf)
+    expect_equal(result$SomPHQ$percentage, Inf)
 
     result <- aira$determine_percentage_effect("SomPHQ", percentage)
 
@@ -206,7 +206,7 @@ test_that('determine_percentage_effect', {
 
     #TODO: Currently this is a magic number, change this once the formula is really final
     expected <- -339
-    expect_equal(result$SomBewegUur, expected, tolerance=1e-3)
+    expect_equal(result$SomBewegUur$percentage, expected, tolerance=1e-3)
   })
 })
 

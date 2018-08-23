@@ -1,4 +1,4 @@
-base_dir <- '~/vault/Datasets/Rosmalen/'
+base_dir <- '~/vault/Datasets/Rosmalen_aira/'
 library('Amelia')
 testdata_var_model_pp1 <- function() {
   data_set <- autovar::read_spss(paste(base_dir, "pp1_nieuw_compleet.sav", sep=""), to.data.frame=TRUE)
@@ -111,11 +111,14 @@ translate_model <- function(model) {
 #               HGI TEST FUNCTIONS            #
 ###############################################
 loadData <- function(file) {
-  data <- read.csv(paste(base_dir, "csv/",file,".csv", sep=""), stringsAsFactors = FALSE)
+  filename <- paste(base_dir, "csv/",file,".csv", sep="")
+  message(filename)
+  data <- read.csv(filename, stringsAsFactors = FALSE)
   included_columns <- c('somberheid', 'tekortschieten', 'ontspanning')
+  included_columns <- c('piekeren', 'onrust', 'opgewektheid', 'concentratie', 'eigenwaarde')
 
   # Remove unused columns
-  data <- data[,(names(data) %in% included_columns)]
+  data <- data[,included_columns]
   autovar::impute_dataframe(data, measurements_per_day = 3, repetitions = 150)
 }
 
@@ -126,69 +129,49 @@ calculateVar <- function(data) {
     measurements_per_day = 3,
     criterion='BIC',
     test_names = c("portmanteau", "portmanteau_squared","skewness"),
-    imputation_iterations = 1
+    imputation_iterations = 150
   )
-  if (models[[1]]$bucket < 0.01 ) print('Model not very valid')
+  if (models[[1]]$bucket < 0.01 ) message('Model not very valid')
   models
 }
 
+testdata_var_model <- function(id, bust_cache=FALSE) {
+  model_name <- paste('var',id,sep='_')
+  file_name <- paste('file',id,sep='_')
 
-testdata_var_model_100551 <- function(bust_cache=FALSE) {
-  if(!exists("var_100551") || bust_cache) {
-    if(!exists("file_100551") || bust_cache) {
-      file_100551 <<- loadData('100551')
+  if(!exists(model_name) || bust_cache) {
+    if(!exists(file_name) || bust_cache) {
+      cur_data <- loadData(id)
+      assign(file_name, cur_data, envir=globalenv())
     }
-    file <- file_100551
-    var_100551 <<- calculateVar(file)
+    file <- get(file_name)
+    var_model <- calculateVar(file)
+    assign(model_name, var_model, envir=globalenv())
   }
-  var.2c <- var_100551[[1]]$varest
-  var.2c
+  get(model_name)[[1]]$varest
 }
 
+# Person 1 Female, 1983, Dutch, 28.71 yearsold
 testdata_var_model_100849 <- function(bust_cache=FALSE) {
-  if(!exists("var_100849") || bust_cache) {
-    if(!exists("file_100849") || bust_cache) {
-      file_100849 <<- loadData('100849')
-    }
-    file <- file_100849
-    var_100849 <<- calculateVar(file)
-  }
-  var.2c <- var_100849[[1]]$varest
-  var.2c
+  testdata_var_model(100849, bust_cache = bust_cache)
 }
 
+# Person 2: Female, 1952, Dutch, 61.73 yearsold
+testdata_var_model_100551 <- function(bust_cache=FALSE) {
+  testdata_var_model(100551, bust_cache = bust_cache)
+}
+
+# Person: 3: Female, 1989 (12), Dutch,  24.80 yearsold
 testdata_var_model_112098 <- function(bust_cache=FALSE) {
-  if(!exists("var_112098") || bust_cache) {
-    if(!exists("file_112098") || bust_cache) {
-      file_112098 <<- loadData('112098')
-    }
-    file <- file_112098
-    var_112098 <<- calculateVar(file)
-  }
-  var.2c <- var_112098[[1]]$varest
-  var.2c
+  testdata_var_model(112098, bust_cache = bust_cache)
 }
 
+# Person 4: Male, 1958, Dutch, 56.39 yearsold
 testdata_var_model_110478 <- function(bust_cache=FALSE) {
-  if(!exists("var_110478") || bust_cache) {
-    if(!exists("file_110478") || bust_cache) {
-      file_110478 <<- loadData('110478')
-    }
-    file <- file_110478
-    var_110478 <<- calculateVar(file)
-  }
-  var.2c <- var_110478[[1]]$varest
-  var.2c
+  testdata_var_model(110478, bust_cache = bust_cache)
 }
 
+# person5 Female, 1989 01 , Dutch, 25.82 yearsold
 testdata_var_model_100713 <- function(bust_cache=FALSE) {
-  if(!exists("var_100713") || bust_cache) {
-    if(!exists("file_100713") || bust_cache) {
-      file_100713 <<- loadData('100713')
-    }
-    file <- file_100713
-    var_100713 <<- calculateVar(file)
-  }
-  var.2c <- var_100713[[1]]$varest
-  var.2c
+  testdata_var_model(100713, bust_cache = bust_cache)
 }

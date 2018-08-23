@@ -74,6 +74,7 @@ test_that('converts a var model to its positive representation', {
     for (r in changed_rows) {
       for (c in c(changed_columns, similar_columns)) {
         count <- count +1
+        browser()
         expect_true(differences[r,c])
       }
     }

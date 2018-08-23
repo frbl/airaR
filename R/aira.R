@@ -82,31 +82,34 @@ Aira <- setRefClass('Aira',
       @param percentage the percentage with which we'd like to improve the variable to improve"
       total <- list()
       for (variable in 1:var_model$K) {
-        variable_name <- .get_variable_name(variable)
-        if (variable_name == variable_to_improve)
-          next
+        current_variable_name <- .get_variable_name(variable)
 
-        effect <- .calculate_irf(variable_name, variable_to_improve)
+        # We won't intervene on the current variable
+        if (current_variable_name == variable_to_improve) next
+
+        # Calculate the cumulative IRF effect of the current variable on the variable we wish to change.
+        effect <- .calculate_irf(current_variable_name, variable_to_improve)
+
+        # IF there is absolutely no effect, we just skip and move on to the next variable.
         if (abs(effect) < 0.0001) {
-          total[[variable_name]] <- list(percentage = Inf, length_of_effect = Inf)
+          total[[current_variable_name]] <- list(percentage = Inf, length_of_effect = Inf)
           next
         }
 
-        length_of_effect <- determine_length_of_effect(variable_name, variable_to_improve, 1, first_effect_only=FALSE, plot_results=FALSE)
+        length_of_effect <- determine_length_of_effect(current_variable_name, variable_to_improve, 1, first_effect_only=FALSE, plot_results=FALSE)
         length_of_effect <- ceiling(length_of_effect$effective_horizon)
 
-        needed_difference <- mean(var_model$y[,variable_to_improve]) * length_of_effect * (percentage / 100) * sd(var_model$y[,variable_name])
-        print(paste('Needed difference:', needed_difference, ', effect: ', effect, ' SD of var to use:',  sd(var_model$y[,variable_name])))
+        needed_difference <- mean(var_model$y[,variable_to_improve]) * length_of_effect * (percentage / 100) * sd(var_model$y[,current_variable_name])
+        message(paste('Needed difference:', needed_difference, ', effect: ', effect, ' SD of var to use:',  sd(var_model$y[,current_variable_name])))
 
+        denominator <- mean(var_model$y[,current_variable_name]) * effect * sd(var_model$y[,variable_to_improve])
 
-        denominator <- mean(var_model$y[,variable_name]) * effect * sd(var_model$y[,variable_to_improve])
-
-        print(paste('Numerator', needed_difference))
-        print(paste('Denominator', denominator))
+        message(paste('Numerator', needed_difference))
+        message(paste('Denominator', denominator))
 
         needed_difference <- needed_difference / denominator
 
-        total[[variable_name]] <- list(percentage = needed_difference * 100, length_of_effect = length_of_effect)
+        total[[current_variable_name]] <- list(percentage = needed_difference * 100, length_of_effect = length_of_effect)
       }
       total
     },

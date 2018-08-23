@@ -1,7 +1,7 @@
 context('aira_output')
 
 testdata_aira_model <- function() {
-  data_set <- autovar::read_spss("inst/pp1_nieuw_compleet.sav", to.data.frame=TRUE)
+  data_set <- autovar::read_spss("inst/pp1.sav", to.data.frame=TRUE)
   endodata <- data_set[,c('SomBewegUur', 'SomPHQ')]
   exodata <- data_set[,c('UitbijterPHQ','UitbijterBeweg')]
   var_model <- vars::VAR(endodata, exogen=exodata, p=2, type='const')
@@ -21,26 +21,26 @@ test_that('print_overview_percentage_effect', {
     skip('Implement correct percentages in the below tests')
   })
   test_that('print_overview_percentage_effect works with positive numbers', {
-    aira_output <- AiraOutput$new(aira = testdata_aira_model())
+    aira_output <- suppressMessages(AiraOutput$new(aira = testdata_aira_model()))
     result <- aira_output$print_overview_percentage_effect(10)
     expected = "Effect achieved:\n"
-    expected = paste(expected, "You could increase your SomBewegUur with 10% by increasing your SomPHQ with 32988%\n", sep ="")
-    expected = paste(expected, "You could increase your SomPHQ with 10% by decreasing your SomBewegUur with 9553%\n", sep ="")
+    expected = paste(expected, "You could increase your SomBewegUur with 10% by increasing your SomPHQ with 330%\n", sep ="")
+    expected = paste(expected, "You could increase your SomPHQ with 10% by decreasing your SomBewegUur with 96%\n", sep ="")
     expect_equal(result, expected)
   })
 
   test_that('print_overview_percentage_effect works with negative numbers', {
-    aira_output <- AiraOutput$new(aira = testdata_aira_model())
+    aira_output <- suppressMessages(AiraOutput$new(aira = testdata_aira_model()))
     result <- aira_output$print_overview_percentage_effect(-10)
     expected = "Effect achieved:\n"
-    expected = paste(expected, "You could decrease your SomBewegUur with 10% by decreasing your SomPHQ with 32988%\n", sep ="")
-    expected = paste(expected, "You could decrease your SomPHQ with 10% by increasing your SomBewegUur with 9553%\n", sep ="")
+    expected = paste(expected, "You could decrease your SomBewegUur with 10% by decreasing your SomPHQ with 330%\n", sep ="")
+    expected = paste(expected, "You could decrease your SomPHQ with 10% by increasing your SomBewegUur with 96%\n", sep ="")
     expect_equal(result, expected)
   })
 })
 
 test_that('print_percentage_effect', {
-  aira_output <- AiraOutput$new(aira = testdata_aira_model())
+  aira_output <- suppressMessages(AiraOutput$new(aira = testdata_aira_model()))
   test_that('Implement correct percentages', {
     # TODO: The numbers used in hte percentages are made up, they should be done properly
     skip('Implement correct percentages in the below tests')
@@ -48,23 +48,23 @@ test_that('print_percentage_effect', {
   test_that('Can print with newlines', {
     result <- aira_output$print_percentage_effect('SomBewegUur', 20, print_newlines = TRUE, print_title = TRUE)
     expected = "Effect achieved:\n"
-    expected = paste(expected, "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 65976%\n", sep ="")
+    expected = paste(expected, "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 660%\n", sep ="")
     expect_equal(result, expected)
   })
   test_that('Can print without newlines', {
     result <- aira_output$print_percentage_effect('SomBewegUur', 20, print_newlines = FALSE, print_title = FALSE)
-    expected = "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 65976%."
+    expected = "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 660%."
     expect_equal(result, expected)
   })
   test_that('Can print with title', {
     result <- aira_output$print_percentage_effect('SomBewegUur', 20, print_newlines = FALSE, print_title = TRUE)
     expected = "Effect achieved: "
-    expected = paste(expected, "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 65976%.", sep ="")
+    expected = paste(expected, "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 660%.", sep ="")
     expect_equal(result, expected)
   })
   test_that('Can print without title', {
     result <- aira_output$print_percentage_effect('SomBewegUur', 20, print_newlines = TRUE, print_title = FALSE)
-    expected = "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 65976%\n"
+    expected = "You could increase your SomBewegUur with 20% by increasing your SomPHQ with 660%\n"
     expect_equal(result, expected)
   })
 })
@@ -117,7 +117,7 @@ test_that('export_model', {
   })
   test_that('Canada', {
     coef(testdata_multiple_variables()$var_model)
-    aira_output <- AiraOutput$new(aira = testdata_multiple_variables())
+    aira_output <- suppressMessages(AiraOutput$new(aira = testdata_multiple_variables()))
     result <- aira_output$export_model()
     expect_equal(names(result),c('links', 'nodes'))
 

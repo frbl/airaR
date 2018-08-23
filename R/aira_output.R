@@ -117,6 +117,7 @@ AiraOutput <- setRefClass(
       }
       result
     },
+
     .generate_network = function(autoregressive = FALSE) {
       varres <- aira$var_model$varresult
 
